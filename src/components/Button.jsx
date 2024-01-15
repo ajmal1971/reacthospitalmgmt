@@ -1,8 +1,8 @@
 /* eslint-disable react/prop-types */
 
-const Button = ({children,type = 'button',bgColor = 'bg-blue-300', textColor = 'text-gray-800',className,...props}) => {
+const Button = ({children,type = 'button', className, onClickEvent = null,...props}) => {
     return (
-        <button type={type} className={`hover:bg-gray-400 font-bold py-2 px-4 rounded inline-flex items-center justify-center ${bgColor} ${textColor} ${className}`} {...props}>
+        <button type={type} className={`bg-gradient-to-r from-cyan-500 to-blue-500 hover:bg-gradient-to-bl text-white px-4 py-1 rounded mt-2 ${className}`} {...props} onClick={onClickEvent}>
             <span>{children}</span>
         </button>
     );

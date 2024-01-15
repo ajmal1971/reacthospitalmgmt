@@ -3,6 +3,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { DatatableSettings } from "../../shared/Constants";
 import {dateFormat} from '../../shared/Utility.js';
+import {Button} from '../index.js';
 
 const PRDataTable = ({value = [], loading = false, cols = [], actions = []}) => {
     const rowClassName = (rowData) => {
@@ -11,12 +12,10 @@ const PRDataTable = ({value = [], loading = false, cols = [], actions = []}) => 
 
     const actionField = (rowData) => {
         return (
-            <div className="flex justify-center">
+            <div className="flex justify-center gap-2">
                 {
                     actions && actions.map((item, index) => (
-                        <button key={index} className={DatatableSettings.actionBtn} onClick={() => item.functionRef(rowData)}>
-                            {item.label}
-                        </button>
+                        <Button key={index} onClickEvent={() => item.functionRef(rowData)}>{item.label}</Button>
                     ))
                 }
             </div>

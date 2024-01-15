@@ -36,8 +36,16 @@ const CreateOrEditDepartment = () => {
         }
     }
 
+    const navigateBack = () => {
+        dispatch(switchPage({pageIndex: PageSwitch.ViewPage, switchData: null}));
+    }
+
     return (
         <section className="w-full h-full bg-white">
+            <div className="flex justify-between items-center ml-5 mr-5 mb-5">
+                <Button onClickEvent={navigateBack}>Go Back</Button>
+            </div>
+
             <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
                 <div className="w-full bg-white rounded-lg md:mt-0 sm:max-w-md xl:p-0 border border-gray-300 shadow-xl shadow-cyan-200">
                     <div className="p-6 space-y-4 md:space-y-6 sm:p-8">

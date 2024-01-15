@@ -56,15 +56,23 @@ const CreateOrEditDoctor = () => {
             });
     }, [switchData]);
 
+    const navigateBack = () => {
+        dispatch(switchPage({pageIndex: PageSwitch.ViewPage, switchData: null}));
+    }
+
     return (
         <section className="w-full h-full bg-white">
+            <div className="flex justify-between items-center ml-5 mr-5 mb-5">
+                <Button onClickEvent={navigateBack}>Go Back</Button>
+            </div>
+
             <div className="flex flex-row items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
                 <div className="w-full bg-white rounded-lg md:mt-0 sm:max-w-2xl xl:p-0 border border-gray-300 shadow-xl shadow-cyan-200">
                     <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
                         <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
                             {!switchData ? 'Create Doctor' : 'Update Doctor'}
                         </h1>
-                        <form onSubmit={handleSubmit(submitForm)} className="space-y-4 md:space-y-6" action="#">
+                        <form onSubmit={handleSubmit(submitForm)} action="#">
                             <div className='flex flex-wrap'>
                                 <div className='w-full md:w-1/2 px-2'>
                                     <PRAutoComplete items={departments} selectedItem={selectedDepartment} setSelectedItem={setSelectedDepartment} property='Name' label='Department'/>

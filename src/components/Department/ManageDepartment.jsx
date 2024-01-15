@@ -5,7 +5,7 @@ import departmentService from "../../appwrite/department.service";
 import { useDispatch, useSelector } from "react-redux";
 import {switchPage} from '../../store/pageSwitchSlice';
 import {Query} from 'appwrite';
-import {Input, PRDataTable} from '../index';
+import {Input, PRDataTable, Button} from '../index';
 import { notify } from "../../shared/Utility";
         
 
@@ -82,7 +82,7 @@ const ManageDepartment = () => {
         <div className="flex flex-col min-h-screen flex-1">
             <div className="flex justify-between items-center ml-5 mr-5 mb-5">
                 <h1 className="text-3xl font-bold text-gray-700">Manage Departments</h1>
-                <button className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:bg-gradient-to-bl text-white px-4 py-2 rounded mt-2" onClick={navigatePage}>Create Department</button>
+                <Button onClickEvent={navigatePage}>Create Department</Button>
             </div>
 
             <div className="flex justify-center mb-3">
@@ -94,7 +94,7 @@ const ManageDepartment = () => {
                         <Input label="Mobile" placeholder="Enter Department Mobile" value={searchFilter.mobile} onChange={(e) => setSearchFilter((prev) => ({...prev, mobile: e.target.value}))} />
                     </div>
                     <div className="w-full md:w-3/12">
-                        <button className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:bg-gradient-to-bl text-white px-4 py-2 rounded mt-6" onClick={search}>Search</button>
+                        <Button onClickEvent={search} className='mt-7'>Search</Button>
                     </div>
                 </div>
             </div>
