@@ -1,4 +1,5 @@
 /* eslint-disable react/prop-types */
+import {useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {Input, Button} from '../index';
 import departmentService from '../../appwrite/department.service';
@@ -10,6 +11,7 @@ import { notify } from '../../shared/Utility';
 const CreateOrEditDepartment = () => {
     const dispatch = useDispatch();
     const switchData = useSelector(state => state.pageSwitch.switchData);
+    const [isLoading, setIsLoading] = useState(false);
 
     const {register, handleSubmit} = useForm({
         defaultValues: {
@@ -20,19 +22,30 @@ const CreateOrEditDepartment = () => {
     });
 
     const submitForm = async (data) => {
-        if (switchData) {
-            const response = await departmentService.updateDepartment(switchData.$id, {...data});
-
-            if (response) {
-                notify.succes('Updated Successfully!');
-                dispatch(switchPage({pageIndex: PageSwitch.ViewPage, switchData: response}));
+        setIsLoading(true);
+        try{
+            if (switchData) {
+                departmentService.updateDepartment(switchData.$id, {...data})
+                    .finally(() => setIsLoading(false))
+                    .then(res => {
+                        if (res) {
+                            notify.succes('Updated Successfully!');
+                            dispatch(switchPage({pageIndex: PageSwitch.ViewPage, switchData: res}));
+                        }
+                    });
+            } else {
+                departmentService.createDepartment({...data})
+                    .finally(() => setIsLoading(false))
+                    .then(res => {
+                        if (res) {
+                            notify.succes('Created Successfully!');
+                            dispatch(switchPage({pageIndex: PageSwitch.ViewPage, switchData: res}));
+                        }
+                    });
             }
-        } else {
-            const response = await departmentService.createDepartment({...data});
-            if (response) {
-                notify.succes('Created Successfully!');
-                dispatch(switchPage({pageIndex: PageSwitch.ViewPage, switchData: response}));
-            }
+        }
+        catch(error) {
+            notify.error(error);
         }
     }
 
@@ -43,7 +56,7 @@ const CreateOrEditDepartment = () => {
     return (
         <section className="w-full h-full bg-white">
             <div className="flex justify-between items-center ml-5 mr-5 mb-5">
-                <Button onClickEvent={navigateBack}>Go Back</Button>
+                <Button onClickEvent={navigateBack} isLoading={isLoading}>Go Back</Button>
             </div>
 
             <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
@@ -57,7 +70,7 @@ const CreateOrEditDepartment = () => {
 
                             <Input label="Mobile" placeholder="Enter Mobile" className="mb-4" {...register("Mobile", { required: true })} />
                             
-                            <Button type="submit" className="w-full">
+                            <Button type="submit" className="w-full" isLoading={isLoading}>
                                 {switchData ? "Update" : "Submit"}
                             </Button>
                         </form>

@@ -15,6 +15,7 @@ const CreateOrEditDoctor = () => {
     
     const [departments, setDepartments] = useState([]);
     const [selectedDepartment, setSelectedDepartment] = useState(undefined);
+    const [isLoading, setIsLoading] = useState(false);
 
     const {register, handleSubmit} = useForm({
         defaultValues: {
@@ -28,19 +29,30 @@ const CreateOrEditDoctor = () => {
     });
 
     const submitForm = async (data) => {
-        if (switchData) {
-            const response = await doctorService.updateDoctor(switchData.$id, {...data, DepartmentId: selectedDepartment.$id});
-
-            if (response) {
-                notify.succes('Updated Successfully!');
-                dispatch(switchPage({pageIndex: PageSwitch.ViewPage, switchData: response}));
+        setIsLoading(true);
+        try{
+            if (switchData) {
+                doctorService.updateDoctor(switchData.$id, {...data, DepartmentId: selectedDepartment.$id})
+                    .finally(() => setIsLoading(false))
+                    .then(res => {
+                        if (res) {
+                            notify.succes('Updated Successfully!');
+                            dispatch(switchPage({pageIndex: PageSwitch.ViewPage, switchData: res}));
+                        }
+                    });
+            } else {
+                doctorService.createDoctor({...data, DepartmentId: selectedDepartment.$id})
+                    .finally(() => setIsLoading(false))
+                    .then(res => {
+                        if (res) {
+                            notify.succes('Created Successfully!');
+                            dispatch(switchPage({pageIndex: PageSwitch.ViewPage, switchData: res}));
+                        }
+                    });
             }
-        } else {
-            const response = await doctorService.createDoctor({...data, DepartmentId: selectedDepartment.$id});
-            if (response) {
-                notify.succes('Created Successfully!');
-                dispatch(switchPage({pageIndex: PageSwitch.ViewPage, switchData: response}));
-            }
+        }
+        catch(error) {
+            notify.error();
         }
     }
 
@@ -63,7 +75,7 @@ const CreateOrEditDoctor = () => {
     return (
         <section className="w-full h-full bg-white">
             <div className="flex justify-between items-center ml-5 mr-5 mb-5">
-                <Button onClickEvent={navigateBack}>Go Back</Button>
+                <Button onClickEvent={navigateBack} isLoading={isLoading}>Go Back</Button>
             </div>
 
             <div className="flex flex-row items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
@@ -101,7 +113,7 @@ const CreateOrEditDoctor = () => {
 
                             <div className='flex flex-wrap'>
                                 <div className='w-2/3 px-2 mx-auto'>
-                                    <Button type="submit" className="w-full">
+                                    <Button type="submit" className="w-full" isLoading={isLoading}>
                                         {switchData ? "Update" : "Submit"}
                                     </Button>
                                 </div>

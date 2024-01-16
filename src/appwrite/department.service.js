@@ -1,6 +1,7 @@
 /* eslint-disable no-useless-catch */
 import config from "../config/config";
 import { Client, ID, Databases, Storage, Query } from 'appwrite';
+import { notify } from "../shared/Utility";
 
 export class DepartmentService {
     client = new Client();
@@ -50,6 +51,7 @@ export class DepartmentService {
             await this.databases.deleteDocument(config.appwriteDatabaseId, this.collectionId, $id);
             return true;
         } catch (error) {
+            notify.error(error.message);
             console.log('Appwrite Service :: deleteDepartment :: error', error);
             return false;
         }

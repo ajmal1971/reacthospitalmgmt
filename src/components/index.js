@@ -15,8 +15,11 @@ import ManageDoctor from './Doctor/ManageDoctor';
 import CreateOrEditDoctor from './Doctor/CreateOrEditDoctor';
 import Doctor from './Doctor/Doctor';
 import PRAutoComplete from './AutoComplete/PRAutoComplete';
+import Diagnosis from './Diagnosis/Diagnosis';
+import ManageDiagnosis from './Diagnosis/ManageDiagnosis';
+import CreateOrEditDiagnosis from './Diagnosis/CreateOrEditDiagnosis';
 
 export {
     Input, Button, Department, Signup, Login, Header, NavGenerator, RouterGuard, Footer, Home, CreateOrEditDepartment,
-    ManageDepartment, PRDataTable, ManageDoctor, CreateOrEditDoctor, Doctor, PRAutoComplete
+    ManageDepartment, PRDataTable, ManageDoctor, CreateOrEditDoctor, Doctor, PRAutoComplete, Diagnosis, ManageDiagnosis, CreateOrEditDiagnosis
 }

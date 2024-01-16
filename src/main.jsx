@@ -5,8 +5,9 @@ import './index.css';
 import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
+import 'sweetalert2/dist/sweetalert2.min.css';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
-import {Home, Department, Doctor} from './components/index.js';
+import {Home, Department, Doctor, Diagnosis} from './components/index.js';
 import { Provider } from 'react-redux';
 import store from './store/store.js';
 
@@ -26,6 +27,10 @@ const router = createBrowserRouter([
       {
         path: "/doctor",
         element: <Doctor />
+      },
+      {
+        path: "/diagnosis",
+        element: <Diagnosis />
       }
     ]
   }

@@ -1,4 +1,5 @@
-import toast from "react-hot-toast"
+import toast from "react-hot-toast";
+import Swal from "sweetalert2";
 
 export const notify = {
     succes: (message) => {
@@ -37,4 +38,18 @@ export const dateFormat = (dateString) => {
 
         return null;
     }
+}
+
+export const confirm = (confirmMessage, callback) => {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: confirmMessage,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes'
+    }).then((confirmed) => {
+        callback(confirmed && confirmed.value === true)
+    });
 }

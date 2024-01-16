@@ -1,38 +1,40 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
 import { PageSwitch } from "../../shared/AppEnum";
-import doctorService from "../../appwrite/doctor.service";
+import diagnosesService from "../../appwrite/diagnoses.service";
 import departmentService from '../../appwrite/department.service';
 import { useDispatch, useSelector } from "react-redux";
 import {switchPage} from '../../store/pageSwitchSlice';
 import {Query} from 'appwrite';
-import {Input, PRDataTable, PRAutoComplete, Button} from '../index';
-import { notify, confirm } from "../../shared/Utility";
+import {Input, PRDataTable, Button, PRAutoComplete} from '../index';
+import { notify } from "../../shared/Utility";
+import {confirm} from "../../shared/Utility";
 
-const ManageDoctor = () => {
+const ManageDiagnosis = () => {
     const [loading, setLoading] = useState(false);
-    const [doctors, setDoctors] = useState([]);
+    const [diagnoses, setDiagnoses] = useState([]);
     const dispatch = useDispatch();
     const switchData = useSelector(state => state.pageSwitch.switchData);
     
     const [departments, setDepartments] = useState([]);
     const [selectedDepartment, setSelectedDepartment] = useState(undefined);
-    const [searchFilter, setSearchFilter] = useState({doctorName: '', mobile: '', speciality: ''});
+    const [searchFilter, setSearchFilter] = useState({name: '', DepartmentId: '', mobile: ''});
 
     const cols = [
         {field: 'department.Name', header: 'Department', dataType: 'string'},
-        {field: 'DoctorName', header: 'Name', dataType: 'string'},
-        {field: 'Speciality', header: 'Speciality', dataType: 'string'},
-        {field: 'VisitPrice', header: 'Visit Price', dataType: 'number'},
+        {field: 'Name', header: 'Name', dataType: 'string'},
+        {field: 'Price', header: 'Price', dataType: 'number'},
         {field: 'Mobile', header: 'Mobile', dataType: 'string'},
+        {field: 'Email', header: 'Email', dataType: 'string'},
+        {field: 'LabAddress', header: 'Lab Address', dataType: 'string'},
         {field: '$createdAt', header: 'Created At', dataType: 'date'},
         {field: '$updatedAt', header: 'Updated At', dataType: 'date'}
     ];
-    
+
     const search = () => {
         const queries = [];
-        if (searchFilter.doctorName && searchFilter.doctorName.toString().trim() !== '') {
-            queries.push(Query.equal('DoctorName', searchFilter.doctorName));
+        if (searchFilter.name && searchFilter.name.toString().trim() !== '') {
+            queries.push(Query.equal('Name', searchFilter.name));
         }
 
         if (selectedDepartment) {
@@ -43,39 +45,35 @@ const ManageDoctor = () => {
             queries.push(Query.equal('Mobile', searchFilter.mobile));
         }
 
-        if (searchFilter.speciality && searchFilter.speciality.toString().trim() !== '') {
-            queries.push(Query.equal('Speciality', searchFilter.speciality));
-        }
-
-        getDoctors(queries);
+        getDiagnoses(queries);
     }
 
-    const getDoctors = (queries = []) => {
+    const getDiagnoses = (queries = []) => {
         setLoading(true);
-        doctorService.getDoctors(queries)
+        diagnosesService.getDiagnoses(queries)
             .then(res => {
                 if (res.documents) {
-                    setDoctors(res.documents);
+                    setDiagnoses(res.documents);
                     setLoading(false);
                 }
             });
     }
 
-    const editDoctor = (rowData) => {
+    const editDiagnosis = (rowData) => {
         dispatch(switchPage({pageIndex: PageSwitch.EditPage, switchData: rowData}));
     }
 
-    const deleteDoctor = async (rowData) => {
-        confirm('Are You Sure To Delete This Doctor?',
+    const deleteDiagnosis = async (rowData) => {
+        confirm('Are You Sure To Delete This Diagnosis?',
             (isConfirmed) => {
                 if (isConfirmed) {
                     setLoading(true);
-                    doctorService.deleteDoctor(rowData.$id)
+                    diagnosesService.deleteDiagnosis(rowData.$id)
                         .finally(() => setLoading(false))
                         .then(res => {
                             if (res) {
                                 notify.succes('Deleted Successfully!');
-                                getDoctors();
+                                getDiagnoses();
                             }
                         });
                 }
@@ -91,15 +89,15 @@ const ManageDoctor = () => {
                 }
             });
 
-        if (switchData?.DoctorId) {
-            const query = switchData?.DoctorId ? [Query.equal('DoctorId', switchData?.DoctorId)] : [];
-            getDoctors(query);
+        if (switchData?.DiagnosisId) {
+            const query = switchData?.DiagnosisId ? [Query.equal('DiagnosisId', switchData?.DiagnosisId)] : [];
+            getDiagnoses(query);
         }
-    }, [switchData?.DoctorId]);
+    }, [switchData?.DiagnosisId]);
 
     const actionFields = [
-        {functionRef: editDoctor, label: 'Edit'},
-        {functionRef: deleteDoctor, label: 'Delete'}
+        {functionRef: editDiagnosis, label: 'Edit'},
+        {functionRef: deleteDiagnosis, label: 'Delete'}
     ];
 
     const navigatePage = () => {
@@ -109,8 +107,8 @@ const ManageDoctor = () => {
     return (
         <div className="flex flex-col min-h-screen flex-1">
             <div className="flex justify-between items-center ml-5 mr-5 mb-5">
-                <h1 className="text-3xl font-bold text-gray-700">Manage Doctors</h1>
-                <Button className='mt-2' onClickEvent={navigatePage}>Create Doctor</Button>
+                <h1 className="text-3xl font-bold text-gray-700">Manage Diagnoses</h1>
+                <Button className='mt-2' onClickEvent={navigatePage}>Create Diagnosis</Button>
             </div>
 
             <div className="flex justify-center mb-3">
@@ -120,15 +118,11 @@ const ManageDoctor = () => {
                     </div>
 
                     <div className="w-full md:w-3/12">
-                        <Input label="Doctor Name" placeholder="Enter Doctor Name" value={searchFilter.doctorName} onChange={(e) => setSearchFilter((prev) => ({...prev, doctorName: e.target.value}))} />
+                        <Input label="Name" placeholder="Enter Diagnosis Name" value={searchFilter.name} onChange={(e) => setSearchFilter((prev) => ({...prev, name: e.target.value}))} />
                     </div>
 
                     <div className="w-full md:w-3/12">
-                        <Input label="Mobile" placeholder="Enter Doctor Mobile" value={searchFilter.mobile} onChange={(e) => setSearchFilter((prev) => ({...prev, mobile: e.target.value}))} />
-                    </div>
-
-                    <div className="w-full md:w-3/12">
-                        <Input label="Speciality" placeholder="Enter Doctor Speciality" value={searchFilter.speciality} onChange={(e) => setSearchFilter((prev) => ({...prev, speciality: e.target.value}))} />
+                        <Input label="Mobile" placeholder="Enter Mobile" value={searchFilter.mobile} onChange={(e) => setSearchFilter((prev) => ({...prev, mobile: e.target.value}))} />
                     </div>
 
                     <div className="w-full md:w-3/12">
@@ -139,11 +133,11 @@ const ManageDoctor = () => {
 
             <div className="flex justify-center">
                 <div className="w-11/12 p-5 border border-gray-300 rounded overflow-x-auto mx-auto">
-                    <PRDataTable value={doctors} loading={loading} cols={cols} actions={actionFields}/>
+                    <PRDataTable value={diagnoses} loading={loading} cols={cols} actions={actionFields}/>
                 </div>
             </div>
         </div>
     );
 };
 
-export default ManageDoctor;
+export default ManageDiagnosis;

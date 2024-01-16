@@ -7,6 +7,7 @@ import {switchPage} from '../../store/pageSwitchSlice';
 import {Query} from 'appwrite';
 import {Input, PRDataTable, Button} from '../index';
 import { notify } from "../../shared/Utility";
+import {confirm} from "../../shared/Utility";
         
 
 const ManageDepartment = () => {
@@ -53,13 +54,26 @@ const ManageDepartment = () => {
     }
 
     const deleteDepartment = async (rowData) => {
-        await departmentService.deleteDepartment(rowData.$id)
-        .then(res => {
-            if (res) {
-                notify.succes('Deleted Successfully!');
-                getDepartments();
-            }
-        });
+        try{
+            confirm('Are You Sure To Delete This Department?',
+                (isConfirmed) => {
+                    if (isConfirmed) {
+                        setLoading(true);
+                        departmentService.deleteDepartment(rowData.$id)
+                            .finally(() => setLoading(false))
+                            .then(res => {
+                                if (res) {
+                                    notify.succes('Deleted Successfully!');
+                                    getDepartments();
+                                }
+                            });
+                    }
+                }
+            );
+        }
+        catch(error) {
+            notify.error(error);
+        }
     }
 
     useEffect(() => {
@@ -82,7 +96,7 @@ const ManageDepartment = () => {
         <div className="flex flex-col min-h-screen flex-1">
             <div className="flex justify-between items-center ml-5 mr-5 mb-5">
                 <h1 className="text-3xl font-bold text-gray-700">Manage Departments</h1>
-                <Button onClickEvent={navigatePage}>Create Department</Button>
+                <Button className='mt-2' onClickEvent={navigatePage}>Create Department</Button>
             </div>
 
             <div className="flex justify-center mb-3">
