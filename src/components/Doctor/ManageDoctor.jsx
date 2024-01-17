@@ -4,9 +4,9 @@ import { PageSwitch } from "../../shared/AppEnum";
 import doctorService from "../../appwrite/doctor.service";
 import departmentService from '../../appwrite/department.service';
 import { useDispatch, useSelector } from "react-redux";
-import {switchPage} from '../../store/pageSwitchSlice';
-import {Query} from 'appwrite';
-import {Input, PRDataTable, PRAutoComplete, Button} from '../index';
+import { switchPage } from '../../store/pageSwitchSlice';
+import { Query } from 'appwrite';
+import { Input, PRDataTable, PRAutoComplete, Button } from '../index';
 import { notify, confirm } from "../../shared/Utility";
 
 const ManageDoctor = () => {
@@ -14,21 +14,21 @@ const ManageDoctor = () => {
     const [doctors, setDoctors] = useState([]);
     const dispatch = useDispatch();
     const switchData = useSelector(state => state.pageSwitch.switchData);
-    
+
     const [departments, setDepartments] = useState([]);
     const [selectedDepartment, setSelectedDepartment] = useState(undefined);
-    const [searchFilter, setSearchFilter] = useState({doctorName: '', mobile: '', speciality: ''});
+    const [searchFilter, setSearchFilter] = useState({ doctorName: '', mobile: '', speciality: '' });
 
     const cols = [
-        {field: 'department.Name', header: 'Department', dataType: 'string'},
-        {field: 'DoctorName', header: 'Name', dataType: 'string'},
-        {field: 'Speciality', header: 'Speciality', dataType: 'string'},
-        {field: 'VisitPrice', header: 'Visit Price', dataType: 'number'},
-        {field: 'Mobile', header: 'Mobile', dataType: 'string'},
-        {field: '$createdAt', header: 'Created At', dataType: 'date'},
-        {field: '$updatedAt', header: 'Updated At', dataType: 'date'}
+        { field: 'department.Name', header: 'Department', dataType: 'string', isSelected: true },
+        { field: 'DoctorName', header: 'Name', dataType: 'string', isSelected: true },
+        { field: 'Speciality', header: 'Speciality', dataType: 'string', isSelected: true },
+        { field: 'VisitPrice', header: 'Visit Price', dataType: 'number', isSelected: true },
+        { field: 'Mobile', header: 'Mobile', dataType: 'string', isSelected: true },
+        { field: '$createdAt', header: 'Created At', dataType: 'date', isSelected: false },
+        { field: '$updatedAt', header: 'Updated At', dataType: 'date', isSelected: false }
     ];
-    
+
     const search = () => {
         const queries = [];
         if (searchFilter.doctorName && searchFilter.doctorName.toString().trim() !== '') {
@@ -62,7 +62,7 @@ const ManageDoctor = () => {
     }
 
     const editDoctor = (rowData) => {
-        dispatch(switchPage({pageIndex: PageSwitch.EditPage, switchData: rowData}));
+        dispatch(switchPage({ pageIndex: PageSwitch.EditPage, switchData: rowData }));
     }
 
     const deleteDoctor = async (rowData) => {
@@ -98,8 +98,8 @@ const ManageDoctor = () => {
     }, [switchData?.DoctorId]);
 
     const actionFields = [
-        {functionRef: editDoctor, label: 'Edit'},
-        {functionRef: deleteDoctor, label: 'Delete'}
+        { functionRef: editDoctor, label: 'Edit' },
+        { functionRef: deleteDoctor, label: 'Delete' }
     ];
 
     const navigatePage = () => {
@@ -116,19 +116,19 @@ const ManageDoctor = () => {
             <div className="flex justify-center mb-3">
                 <div className="w-11/12 flex gap-2">
                     <div className="w-full md:w-3/12">
-                        <PRAutoComplete items={departments} selectedItem={selectedDepartment} setSelectedItem={setSelectedDepartment} property='Name' label='Department'/>
+                        <PRAutoComplete items={departments} selectedItem={selectedDepartment} setSelectedItem={setSelectedDepartment} property='Name' label='Department' />
                     </div>
 
                     <div className="w-full md:w-3/12">
-                        <Input label="Doctor Name" placeholder="Enter Doctor Name" value={searchFilter.doctorName} onChange={(e) => setSearchFilter((prev) => ({...prev, doctorName: e.target.value}))} />
+                        <Input label="Doctor Name" placeholder="Enter Doctor Name" value={searchFilter.doctorName} onChange={(e) => setSearchFilter((prev) => ({ ...prev, doctorName: e.target.value }))} />
                     </div>
 
                     <div className="w-full md:w-3/12">
-                        <Input label="Mobile" placeholder="Enter Doctor Mobile" value={searchFilter.mobile} onChange={(e) => setSearchFilter((prev) => ({...prev, mobile: e.target.value}))} />
+                        <Input label="Mobile" placeholder="Enter Doctor Mobile" value={searchFilter.mobile} onChange={(e) => setSearchFilter((prev) => ({ ...prev, mobile: e.target.value }))} />
                     </div>
 
                     <div className="w-full md:w-3/12">
-                        <Input label="Speciality" placeholder="Enter Doctor Speciality" value={searchFilter.speciality} onChange={(e) => setSearchFilter((prev) => ({...prev, speciality: e.target.value}))} />
+                        <Input label="Speciality" placeholder="Enter Doctor Speciality" value={searchFilter.speciality} onChange={(e) => setSearchFilter((prev) => ({ ...prev, speciality: e.target.value }))} />
                     </div>
 
                     <div className="w-full md:w-3/12">
@@ -139,7 +139,7 @@ const ManageDoctor = () => {
 
             <div className="flex justify-center">
                 <div className="w-11/12 p-5 border border-gray-300 rounded overflow-x-auto mx-auto">
-                    <PRDataTable value={doctors} loading={loading} cols={cols} actions={actionFields}/>
+                    <PRDataTable value={doctors} loading={loading} cols={cols} actions={actionFields} />
                 </div>
             </div>
         </div>

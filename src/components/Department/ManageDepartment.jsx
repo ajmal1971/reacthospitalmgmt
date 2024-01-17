@@ -3,26 +3,26 @@ import { useEffect, useState } from "react";
 import { PageSwitch } from "../../shared/AppEnum";
 import departmentService from "../../appwrite/department.service";
 import { useDispatch, useSelector } from "react-redux";
-import {switchPage} from '../../store/pageSwitchSlice';
-import {Query} from 'appwrite';
-import {Input, PRDataTable, Button} from '../index';
+import { switchPage } from '../../store/pageSwitchSlice';
+import { Query } from 'appwrite';
+import { Input, PRDataTable, Button } from '../index';
 import { notify } from "../../shared/Utility";
-import {confirm} from "../../shared/Utility";
-        
+import { confirm } from "../../shared/Utility";
+
 
 const ManageDepartment = () => {
     const [loading, setLoading] = useState(false);
     const [departments, setDepartments] = useState([]);
     const dispatch = useDispatch();
     const switchData = useSelector(state => state.pageSwitch.switchData);
-    const [searchFilter, setSearchFilter] = useState({name: '', mobile: ''});
+    const [searchFilter, setSearchFilter] = useState({ name: '', mobile: '' });
 
     const cols = [
         // {field: '$id', header: 'Id', dataType: 'string'},
-        {field: 'Name', header: 'Name', dataType: 'string'},
-        {field: 'Mobile', header: 'Mobile', dataType: 'string'},
-        {field: '$createdAt', header: 'Created At', dataType: 'date'},
-        {field: '$updatedAt', header: 'Updated At', dataType: 'date'}
+        { field: 'Name', header: 'Name', dataType: 'string', isSelected: true },
+        { field: 'Mobile', header: 'Mobile', dataType: 'string', isSelected: true },
+        { field: '$createdAt', header: 'Created At', dataType: 'date', isSelected: false },
+        { field: '$updatedAt', header: 'Updated At', dataType: 'date', isSelected: false }
     ];
 
     const search = () => {
@@ -50,11 +50,11 @@ const ManageDepartment = () => {
     }
 
     const editDepartment = (rowData) => {
-        dispatch(switchPage({pageIndex: PageSwitch.EditPage, switchData: rowData}));
+        dispatch(switchPage({ pageIndex: PageSwitch.EditPage, switchData: rowData }));
     }
 
     const deleteDepartment = async (rowData) => {
-        try{
+        try {
             confirm('Are You Sure To Delete This Department?',
                 (isConfirmed) => {
                     if (isConfirmed) {
@@ -71,7 +71,7 @@ const ManageDepartment = () => {
                 }
             );
         }
-        catch(error) {
+        catch (error) {
             notify.error(error);
         }
     }
@@ -84,8 +84,8 @@ const ManageDepartment = () => {
     }, [switchData?.DepartmentId]);
 
     const actionFields = [
-        {functionRef: editDepartment, label: 'Edit'},
-        {functionRef: deleteDepartment, label: 'Delete'}
+        { functionRef: editDepartment, label: 'Edit' },
+        { functionRef: deleteDepartment, label: 'Delete' }
     ];
 
     const navigatePage = () => {
@@ -102,10 +102,10 @@ const ManageDepartment = () => {
             <div className="flex justify-center mb-3">
                 <div className="w-11/12 flex gap-2">
                     <div className="w-full md:w-3/12">
-                        <Input label="Name" placeholder="Enter Department Name" value={searchFilter.name} onChange={(e) => setSearchFilter((prev) => ({...prev, name: e.target.value}))}/>
+                        <Input label="Name" placeholder="Enter Department Name" value={searchFilter.name} onChange={(e) => setSearchFilter((prev) => ({ ...prev, name: e.target.value }))} />
                     </div>
                     <div className="w-full md:w-3/12">
-                        <Input label="Mobile" placeholder="Enter Department Mobile" value={searchFilter.mobile} onChange={(e) => setSearchFilter((prev) => ({...prev, mobile: e.target.value}))} />
+                        <Input label="Mobile" placeholder="Enter Department Mobile" value={searchFilter.mobile} onChange={(e) => setSearchFilter((prev) => ({ ...prev, mobile: e.target.value }))} />
                     </div>
                     <div className="w-full md:w-3/12">
                         <Button onClickEvent={search} className='mt-7'>Search</Button>
@@ -115,7 +115,7 @@ const ManageDepartment = () => {
 
             <div className="flex justify-center">
                 <div className="w-11/12 p-5 border border-gray-300 rounded overflow-x-auto mx-auto">
-                    <PRDataTable value={departments} loading={loading} cols={cols} actions={actionFields}/>
+                    <PRDataTable value={departments} loading={loading} cols={cols} actions={actionFields} />
                 </div>
             </div>
         </div>
