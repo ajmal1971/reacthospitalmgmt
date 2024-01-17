@@ -56,7 +56,7 @@ const CreateOrEditDepartment = () => {
     return (
         <section className="w-full h-full bg-white">
             <div className="flex justify-between items-center ml-5 mr-5 mb-5">
-                <Button onClickEvent={navigateBack} isLoading={isLoading}>Go Back</Button>
+                <Button className='mt-2' onClickEvent={navigateBack} isLoading={isLoading}>Go Back</Button>
             </div>
 
             <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
