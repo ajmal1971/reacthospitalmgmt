@@ -2,11 +2,11 @@
 import config from "../config/config";
 import { Client, ID, Databases, Storage, Query } from 'appwrite';
 
-export class DoctorService {
+export class PatientBillService {
     client = new Client();
     databases;
     storage;
-    collectionId = config.appwriteCollectionId.split(',').find(pair => pair.includes('Doctor')).split(':')[1];
+    collectionId = config.appwriteCollectionId.split(',').find(pair => pair.includes('PatientBill')).split(':')[1];
 
     constructor() {
         this.client
@@ -17,64 +17,59 @@ export class DoctorService {
         this.storage = new Storage(this.client);
     }
 
-    async createDoctor({ DoctorName, DepartmentId, Mobile, Speciality, VisitPrice }) {
+    async createPatientBill({ PatientHistoryId, PatientPayable }) {
         try {
             const rowId = await this.getRowId();
             return await this.databases.createDocument(config.appwriteDatabaseId, this.collectionId, ID.unique(),
                 {
-                    department: DepartmentId,
-                    Mobile,
-                    VisitPrice,
-                    DoctorName,
-                    Speciality,
-                    DoctorId: rowId
+                    patientHistory: PatientHistoryId,
+                    PatientPayable,
+                    PatientPaid: false,
+                    PatientBillId: rowId
                 }
             );
         } catch (error) {
-            console.log('Appwrite Service :: createDoctor :: error', error);
+            console.log('Appwrite Service :: createPatientBill :: error', error);
         }
     }
 
-    async updateDoctor($id, { DoctorName, DepartmentId, Mobile, Speciality, VisitPrice }) {
+    async updatePatientBill($id, { PatientHistoryId, PatientPayable }) {
         try {
             return await this.databases.updateDocument(config.appwriteDatabaseId, this.collectionId, $id,
                 {
-                    department: DepartmentId,
-                    Mobile,
-                    VisitPrice,
-                    DoctorName,
-                    Speciality
+                    patientHistory: PatientHistoryId,
+                    PatientPayable
                 }
             )
         } catch (error) {
-            console.log('Appwrite Service :: updateDoctor :: error', error);
+            console.log('Appwrite Service :: updatePatientBill :: error', error);
         }
     }
 
-    async deleteDoctor($id) {
+    async deletePatientBill($id) {
         try {
             await this.databases.deleteDocument(config.appwriteDatabaseId, this.collectionId, $id);
             return true;
         } catch (error) {
-            console.log('Appwrite Service :: deleteDoctor :: error', error);
+            console.log('Appwrite Service :: deletePatientBill :: error', error);
             return false;
         }
     }
 
-    async getDoctors(quories = []) {
+    async getPatientBills(quories = []) {
         try {
             return await this.databases.listDocuments(config.appwriteDatabaseId, this.collectionId, quories);
         } catch (error) {
-            console.log('Appwrite Service :: getDoctors :: error', error);
+            console.log('Appwrite Service :: getPatientBills :: error', error);
             return false;
         }
     }
 
     async getRowId() {
         let rowId = 0;
-        const lastRow = await this.getDoctors([Query.orderDesc('DoctorId'), Query.limit(1)]);
+        const lastRow = await this.getPatientBills([Query.orderDesc('PatientBillId'), Query.limit(1)]);
         if (lastRow.documents.length > 0) {
-            rowId = lastRow.documents[0].DoctorId + 1;
+            rowId = lastRow.documents[0].PatientBillId + 1;
         } else {
             rowId = 1;
         }
@@ -83,6 +78,6 @@ export class DoctorService {
     }
 }
 
-const doctorService = new DoctorService();
+const patientBillService = new PatientBillService();
 
-export default doctorService;
+export default patientBillService;

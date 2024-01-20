@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { DatatableSettings } from "../../shared/Constants";
@@ -8,12 +8,7 @@ import { Button } from '../index.js';
 import { MultiSelect } from 'primereact/multiselect';
 
 const PRDataTable = ({ value = [], loading = false, cols = [], actions = [] }) => {
-    const [selectedOptions, setSelectedOptions] = useState([]);
-
-    useEffect(() => {
-        const preselectedOptions = cols.filter(option => option.isSelected);
-        setSelectedOptions(preselectedOptions);
-    }, []);
+    const [selectedOptions, setSelectedOptions] = useState(cols.filter(option => option.isSelected));
 
     const renderHeader = () => {
         return (

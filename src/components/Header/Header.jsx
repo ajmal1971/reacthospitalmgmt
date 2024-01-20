@@ -37,6 +37,24 @@ const Header = () => {
             ]
         },
         {
+            name: 'Patient',
+            path: '/patient',
+            children: [
+                {
+                    name: 'Patient',
+                    path: '/patient',
+                    // active: !authStatus
+                    children: []
+                },
+                {
+                    name: 'Patient History',
+                    path: '/patient-history',
+                    // active: !authStatus
+                    children: []
+                }
+            ]
+        },
+        {
             name: 'About',
             path: '/about',
             // active: !authStatus,
