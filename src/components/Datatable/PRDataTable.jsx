@@ -6,6 +6,7 @@ import { DatatableSettings } from "../../shared/Constants";
 import { dateTimeFormat, dateFormat } from '../../shared/Utility.js';
 import { Button } from '../index.js';
 import { MultiSelect } from 'primereact/multiselect';
+import { DataType } from '../../shared/AppEnum.js';
 
 const PRDataTable = ({ value = [], loading = false, cols = [], actions = [] }) => {
     const [selectedOptions, setSelectedOptions] = useState(cols.filter(option => option.isSelected));
@@ -35,9 +36,14 @@ const PRDataTable = ({ value = [], loading = false, cols = [], actions = [] }) =
         <DataTable value={value} paginator rows={10} dataKey="$id" header={renderHeader} filterDisplay="row" loading={loading} emptyMessage={DatatableSettings.emptyMessage} paginatorTemplate={DatatableSettings.paginatorTemplate} rowsPerPageOptions={DatatableSettings.rowsPerPageOptions} sortMode="multiple" removableSort resizableColumns columnResizeMode="fit" style={{ border: '1px solid #E0E0E0' }}>
             {
                 selectedOptions.map((col, index) =>
-                (
-                    <Column key={index} field={col.field} header={col.header} filter={true} showFilterMenu={false} sortable filterPlaceholder="Search" headerClassName={DatatableSettings.headerClassName} filterHeaderClassName={DatatableSettings.filterHeaderClassName} body={(rowData) => col.dataType === 'datetime' ? dateTimeFormat(rowData[col.field]) : col.dataType === 'date' ? dateFormat(rowData[col.field]) : rowData[col.field]} />
-                )
+                    (col.dataType === DataType.date || col.dataType === DataType.dateTime) ?
+                        (
+                            <Column key={index} field={col.field} header={col.header} filter={true} showFilterMenu={false} sortable filterPlaceholder="Search" headerClassName={DatatableSettings.headerClassName} filterHeaderClassName={DatatableSettings.filterHeaderClassName} body={(rowData) => col.dataType === DataType.dateTime ? dateTimeFormat(rowData[col.field]) : dateFormat(rowData[col.field])} />
+                        )
+                        :
+                        (
+                            <Column key={index} field={col.field} header={col.header} filter={true} showFilterMenu={false} sortable filterPlaceholder="Search" headerClassName={DatatableSettings.headerClassName} filterHeaderClassName={DatatableSettings.filterHeaderClassName} />
+                        )
                 )
             }
 

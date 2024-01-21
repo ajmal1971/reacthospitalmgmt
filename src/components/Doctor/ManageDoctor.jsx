@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
-import { PageSwitch } from "../../shared/AppEnum";
+import { PageSwitch, DataType } from "../../shared/AppEnum";
 import doctorService from "../../appwrite/doctor.service";
 import departmentService from '../../appwrite/department.service';
 import { useDispatch, useSelector } from "react-redux";
@@ -10,41 +10,43 @@ import { Input, PRDataTable, PRAutoComplete, Button } from '../index';
 import { notify, confirm } from "../../shared/Utility";
 
 const ManageDoctor = () => {
-    const [loading, setLoading] = useState(false);
-    const [doctors, setDoctors] = useState([]);
     const dispatch = useDispatch();
     const switchData = useSelector(state => state.pageSwitch.switchData);
 
+    const [loading, setLoading] = useState(false);
+    const [doctors, setDoctors] = useState([]);
+
     const [departments, setDepartments] = useState([]);
     const [selectedDepartment, setSelectedDepartment] = useState(undefined);
-    const [searchFilter, setSearchFilter] = useState({ doctorName: '', mobile: '', speciality: '' });
+
+    const [searchFilter, setSearchFilter] = useState({ Name: '', Mobile: '', Specialization: '' });
 
     const cols = [
-        { field: 'department.Name', header: 'Department', dataType: 'string', isSelected: true },
-        { field: 'DoctorName', header: 'Name', dataType: 'string', isSelected: true },
-        { field: 'Speciality', header: 'Speciality', dataType: 'string', isSelected: true },
-        { field: 'VisitPrice', header: 'Visit Price', dataType: 'number', isSelected: true },
-        { field: 'Mobile', header: 'Mobile', dataType: 'string', isSelected: true },
-        { field: '$createdAt', header: 'Created At', dataType: 'date', isSelected: false },
-        { field: '$updatedAt', header: 'Updated At', dataType: 'date', isSelected: false }
+        { field: '$id', header: 'Id', dataType: DataType.string, isSelected: false },
+        { field: 'Departments.Name', header: 'Department', dataType: DataType.string, isSelected: true },
+        { field: 'Name', header: 'Name', dataType: DataType.string, isSelected: true },
+        { field: 'Specialization', header: 'Specialization', dataType: DataType.string, isSelected: true },
+        { field: 'Mobile', header: 'Mobile', dataType: DataType.string, isSelected: true },
+        { field: '$createdAt', header: 'Created At', dataType: DataType.dateTime, isSelected: false },
+        { field: '$updatedAt', header: 'Updated At', dataType: DataType.dateTime, isSelected: false }
     ];
 
     const search = () => {
         const queries = [];
-        if (searchFilter.doctorName && searchFilter.doctorName.toString().trim() !== '') {
-            queries.push(Query.equal('DoctorName', searchFilter.doctorName));
+        if (searchFilter.Name && searchFilter.Name.toString().trim() !== '') {
+            queries.push(Query.equal('Name', searchFilter.Name));
         }
 
         if (selectedDepartment) {
-            queries.push(Query.equal('department', selectedDepartment.$id));
+            queries.push(Query.equal('Departments', selectedDepartment.$id));
         }
 
-        if (searchFilter.mobile && searchFilter.mobile.toString().trim() !== '') {
-            queries.push(Query.equal('Mobile', searchFilter.mobile));
+        if (searchFilter.Mobile && searchFilter.Mobile.toString().trim() !== '') {
+            queries.push(Query.equal('Mobile', searchFilter.Mobile));
         }
 
-        if (searchFilter.speciality && searchFilter.speciality.toString().trim() !== '') {
-            queries.push(Query.equal('Speciality', searchFilter.speciality));
+        if (searchFilter.Specialization && searchFilter.Specialization.toString().trim() !== '') {
+            queries.push(Query.equal('Specialization', searchFilter.Specialization));
         }
 
         getDoctors(queries);
@@ -91,11 +93,11 @@ const ManageDoctor = () => {
                 }
             });
 
-        if (switchData?.DoctorId) {
-            const query = switchData?.DoctorId ? [Query.equal('DoctorId', switchData?.DoctorId)] : [];
+        if (switchData?.Id) {
+            const query = switchData?.Id ? [Query.equal('Id', switchData?.Id)] : [];
             getDoctors(query);
         }
-    }, [switchData?.DoctorId]);
+    }, [switchData?.Id]);
 
     const actionFields = [
         { functionRef: editDoctor, label: 'Edit' },
@@ -120,15 +122,15 @@ const ManageDoctor = () => {
                     </div>
 
                     <div className="w-full md:w-3/12">
-                        <Input label="Doctor Name" placeholder="Enter Doctor Name" value={searchFilter.doctorName} onChange={(e) => setSearchFilter((prev) => ({ ...prev, doctorName: e.target.value }))} />
+                        <Input label="Doctor Name" placeholder="Enter Doctor Name" value={searchFilter.Name} onChange={(e) => setSearchFilter((prev) => ({ ...prev, Name: e.target.value }))} />
                     </div>
 
                     <div className="w-full md:w-3/12">
-                        <Input label="Mobile" placeholder="Enter Doctor Mobile" value={searchFilter.mobile} onChange={(e) => setSearchFilter((prev) => ({ ...prev, mobile: e.target.value }))} />
+                        <Input label="Mobile" placeholder="Enter Doctor Mobile" value={searchFilter.Mobile} onChange={(e) => setSearchFilter((prev) => ({ ...prev, Mobile: e.target.value }))} />
                     </div>
 
                     <div className="w-full md:w-3/12">
-                        <Input label="Speciality" placeholder="Enter Doctor Speciality" value={searchFilter.speciality} onChange={(e) => setSearchFilter((prev) => ({ ...prev, speciality: e.target.value }))} />
+                        <Input label="Specialization" placeholder="Enter Doctor Specialization" value={searchFilter.Specialization} onChange={(e) => setSearchFilter((prev) => ({ ...prev, Specialization: e.target.value }))} />
                     </div>
 
                     <div className="w-full md:w-3/12">

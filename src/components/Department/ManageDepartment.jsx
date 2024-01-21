@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
-import { PageSwitch } from "../../shared/AppEnum";
+import { PageSwitch, DataType } from "../../shared/AppEnum";
 import departmentService from "../../appwrite/department.service";
 import { useDispatch, useSelector } from "react-redux";
 import { switchPage } from '../../store/pageSwitchSlice';
@@ -18,11 +18,11 @@ const ManageDepartment = () => {
     const [searchFilter, setSearchFilter] = useState({ name: '' });
 
     const cols = [
-        { field: '$id', header: 'Id', dataType: 'string', isSelected: false },
-        { field: 'Name', header: 'Name', dataType: 'string', isSelected: true },
-        { field: 'Description', header: 'Description', dataType: 'string', isSelected: true },
-        { field: '$createdAt', header: 'Created At', dataType: 'datetime', isSelected: false },
-        { field: '$updatedAt', header: 'Updated At', dataType: 'datetime', isSelected: false }
+        { field: '$id', header: 'Id', dataType: DataType.string, isSelected: false },
+        { field: 'Name', header: 'Name', dataType: DataType.string, isSelected: true },
+        { field: 'Description', header: 'Description', dataType: DataType.string, isSelected: true },
+        { field: '$createdAt', header: 'Created At', dataType: DataType.dateTime, isSelected: false },
+        { field: '$updatedAt', header: 'Updated At', dataType: DataType.dateTime, isSelected: false }
     ];
 
     const search = () => {
