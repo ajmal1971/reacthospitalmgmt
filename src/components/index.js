@@ -25,8 +25,11 @@ import PRCalendar from './PRCalendar/PRCalendar';
 import PatientHistory from './PatientHistory/PatientHistory';
 import ManagePatientHistory from './PatientHistory/ManagePatientHistory';
 import CreateOrEditPatientHistory from './PatientHistory/CreateOrEditPatientHistory';
+import PatientFollowupHistory from './PatientFollowupHistory/PatientFollowupHistory';
+import ManagePatientFollowupHistory from './PatientFollowupHistory/ManagePatientFollowupHistory';
+import CreateOrEditPatientFollowupHistory from './PatientFollowupHistory/CreateOrEditPatientFollowupHistory';
 
 export {
     Input, Button, Department, Signup, Login, Header, NavGenerator, RouterGuard, Footer, Home, CreateOrEditDepartment,
-    ManageDepartment, PRDataTable, ManageDoctor, CreateOrEditDoctor, Doctor, PRAutoComplete, Diagnosis, ManageDiagnosis, CreateOrEditDiagnosis, Patient, ManagePatient, CreateOrEditPatient, PRCalendar, PatientHistory, ManagePatientHistory, CreateOrEditPatientHistory
+    ManageDepartment, PRDataTable, ManageDoctor, CreateOrEditDoctor, Doctor, PRAutoComplete, Diagnosis, ManageDiagnosis, CreateOrEditDiagnosis, Patient, ManagePatient, CreateOrEditPatient, PRCalendar, PatientHistory, ManagePatientHistory, CreateOrEditPatientHistory, PatientFollowupHistory, ManagePatientFollowupHistory, CreateOrEditPatientFollowupHistory
 }

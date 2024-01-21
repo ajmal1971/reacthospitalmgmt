@@ -9,29 +9,34 @@ const Header = () => {
             name: 'Home',
             path: '/',
             active: true,
+            isChild: false,
             children: []
         },
         {
             name: 'Hospital',
             path: '/hospital',
             // active: authStatus,
+            isChild: false,
             children: [
                 {
                     name: 'Department',
                     path: '/department',
                     // active: !authStatus
+                    isChild: true,
                     children: []
                 },
                 {
                     name: 'Doctor',
                     path: '/doctor',
                     // active: !authStatus
+                    isChild: true,
                     children: []
                 },
                 {
                     name: 'Diagnosis',
                     path: '/diagnosis',
                     // active: !authStatus
+                    isChild: true,
                     children: []
                 }
             ]
@@ -39,17 +44,27 @@ const Header = () => {
         {
             name: 'Patient',
             path: '/patient',
+            isChild: false,
             children: [
                 {
                     name: 'Patient',
                     path: '/patient',
                     // active: !authStatus
+                    isChild: true,
                     children: []
                 },
                 {
                     name: 'Patient History',
                     path: '/patient-history',
                     // active: !authStatus
+                    isChild: true,
+                    children: []
+                },
+                {
+                    name: 'Patient Followup History',
+                    path: '/patient-followup-history',
+                    // active: !authStatus
+                    isChild: true,
                     children: []
                 }
             ]
@@ -57,12 +72,14 @@ const Header = () => {
         {
             name: 'About',
             path: '/about',
+            isChild: false,
             // active: !authStatus,
             children: []
         },
         {
             name: 'Contact',
             path: '/contact',
+            isChild: false,
             // active: !authStatus
             children: []
         }
