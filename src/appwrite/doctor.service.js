@@ -1,12 +1,13 @@
 /* eslint-disable no-useless-catch */
 import config from "../config/config";
 import { Client, ID, Databases, Storage, Query } from 'appwrite';
+import { getRecordId } from "../shared/Utility";
 
 export class DoctorService {
     client = new Client();
     databases;
     storage;
-    collectionId = config.appwriteCollectionId.split(',').find(pair => pair.includes('Doctor')).split(':')[1];
+    collectionId = config.appwriteCollectionId.split(',').find(pair => pair.includes('Doctors')).split(':')[1];
 
     constructor() {
         this.client
@@ -17,17 +18,16 @@ export class DoctorService {
         this.storage = new Storage(this.client);
     }
 
-    async createDoctor({ DoctorName, DepartmentId, Mobile, Speciality, VisitPrice }) {
+    async createDoctor({ Name, DepartmentId, Mobile, Specialization }) {
         try {
-            const rowId = await this.getRowId();
+            const recordId = await getRecordId(this.getDoctors.bind(this));
             return await this.databases.createDocument(config.appwriteDatabaseId, this.collectionId, ID.unique(),
                 {
-                    department: DepartmentId,
+                    Name,
+                    Departments: DepartmentId,
                     Mobile,
-                    VisitPrice,
-                    DoctorName,
-                    Speciality,
-                    DoctorId: rowId
+                    Specialization,
+                    Id: recordId
                 }
             );
         } catch (error) {
@@ -35,15 +35,14 @@ export class DoctorService {
         }
     }
 
-    async updateDoctor($id, { DoctorName, DepartmentId, Mobile, Speciality, VisitPrice }) {
+    async updateDoctor($id, { Name, DepartmentId, Mobile, Specialization }) {
         try {
             return await this.databases.updateDocument(config.appwriteDatabaseId, this.collectionId, $id,
                 {
-                    department: DepartmentId,
+                    Name,
+                    Departments: DepartmentId,
                     Mobile,
-                    VisitPrice,
-                    DoctorName,
-                    Speciality
+                    Specialization
                 }
             )
         } catch (error) {
@@ -68,18 +67,6 @@ export class DoctorService {
             console.log('Appwrite Service :: getDoctors :: error', error);
             return false;
         }
-    }
-
-    async getRowId() {
-        let rowId = 0;
-        const lastRow = await this.getDoctors([Query.orderDesc('DoctorId'), Query.limit(1)]);
-        if (lastRow.documents.length > 0) {
-            rowId = lastRow.documents[0].DoctorId + 1;
-        } else {
-            rowId = 1;
-        }
-
-        return rowId;
     }
 }
 

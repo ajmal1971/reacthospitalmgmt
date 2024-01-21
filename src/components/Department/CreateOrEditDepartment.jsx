@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
-import {useState} from 'react';
-import {useForm} from 'react-hook-form';
-import {Input, Button} from '../index';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { Input, Button } from '../index';
 import departmentService from '../../appwrite/department.service';
 import { useDispatch, useSelector } from 'react-redux';
 import { switchPage } from '../../store/pageSwitchSlice';
@@ -13,44 +13,44 @@ const CreateOrEditDepartment = () => {
     const switchData = useSelector(state => state.pageSwitch.switchData);
     const [isLoading, setIsLoading] = useState(false);
 
-    const {register, handleSubmit} = useForm({
+    const { register, handleSubmit } = useForm({
         defaultValues: {
             $id: switchData?.$id || null,
             Name: switchData?.Name || '',
-            Mobile: switchData?.Mobile || ''
+            Description: switchData?.Description || ''
         }
     });
 
     const submitForm = async (data) => {
         setIsLoading(true);
-        try{
+        try {
             if (switchData) {
-                departmentService.updateDepartment(switchData.$id, {...data})
+                departmentService.updateDepartment(switchData.$id, { ...data })
                     .finally(() => setIsLoading(false))
                     .then(res => {
                         if (res) {
                             notify.succes('Updated Successfully!');
-                            dispatch(switchPage({pageIndex: PageSwitch.ViewPage, switchData: res}));
+                            dispatch(switchPage({ pageIndex: PageSwitch.ViewPage, switchData: res }));
                         }
                     });
             } else {
-                departmentService.createDepartment({...data})
+                departmentService.createDepartment({ ...data })
                     .finally(() => setIsLoading(false))
                     .then(res => {
                         if (res) {
                             notify.succes('Created Successfully!');
-                            dispatch(switchPage({pageIndex: PageSwitch.ViewPage, switchData: res}));
+                            dispatch(switchPage({ pageIndex: PageSwitch.ViewPage, switchData: res }));
                         }
                     });
             }
         }
-        catch(error) {
+        catch (error) {
             notify.error(error);
         }
     }
 
     const navigateBack = () => {
-        dispatch(switchPage({pageIndex: PageSwitch.ViewPage, switchData: null}));
+        dispatch(switchPage({ pageIndex: PageSwitch.ViewPage, switchData: null }));
     }
 
     return (
@@ -68,8 +68,8 @@ const CreateOrEditDepartment = () => {
                         <form onSubmit={handleSubmit(submitForm)} className="space-y-4 md:space-y-6" action="#">
                             <Input label="Name" placeholder="Enter Department Name" className="mb-4" {...register("Name", { required: true })} />
 
-                            <Input label="Mobile" placeholder="Enter Mobile" className="mb-4" {...register("Mobile", { required: true })} />
-                            
+                            <Input label="Description" placeholder="Enter Description" className="mb-4" {...register("Description")} />
+
                             <Button type="submit" className="w-full" isLoading={isLoading}>
                                 {switchData ? "Update" : "Submit"}
                             </Button>

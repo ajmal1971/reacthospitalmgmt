@@ -2,12 +2,13 @@
 import config from "../config/config";
 import { Client, ID, Databases, Storage, Query } from 'appwrite';
 import { notify } from "../shared/Utility";
+import { getRecordId } from "../shared/Utility";
 
 export class DepartmentService {
     client = new Client();
     databases;
     storage;
-    collectionId = config.appwriteCollectionId.split(',').find(pair => pair.includes('Department')).split(':')[1];
+    collectionId = config.appwriteCollectionId.split(',').find(pair => pair.includes('Departments')).split(':')[1];
 
     constructor() {
         this.client
@@ -18,14 +19,14 @@ export class DepartmentService {
         this.storage = new Storage(this.client);
     }
 
-    async createDepartment({ Name, Mobile }) {
+    async createDepartment({ Name, Description }) {
         try {
-            const departmentId = await this.getDepartmentId();
+            const recordId = await getRecordId(this.getDepartments.bind(this)); //bind(this) referance to the instance of DepartmentService class while calling from outside.
             return await this.databases.createDocument(config.appwriteDatabaseId, this.collectionId, ID.unique(),
                 {
                     Name,
-                    Mobile,
-                    DepartmentId: departmentId
+                    Description,
+                    Id: recordId
                 }
             );
         } catch (error) {
@@ -33,12 +34,12 @@ export class DepartmentService {
         }
     }
 
-    async updateDepartment($id, { Name, Mobile }) {
+    async updateDepartment($id, { Name, Description }) {
         try {
             return await this.databases.updateDocument(config.appwriteDatabaseId, this.collectionId, $id,
                 {
                     Name,
-                    Mobile
+                    Description
                 }
             )
         } catch (error) {
@@ -64,18 +65,6 @@ export class DepartmentService {
             console.log('Appwrite Service :: getDepartments :: error', error);
             return false;
         }
-    }
-
-    async getDepartmentId() {
-        let deptId = 0;
-        const lastDept = await this.getDepartments([Query.orderDesc('DepartmentId'), Query.limit(1)]);
-        if (lastDept.documents.length > 0) {
-            deptId = lastDept.documents[0].DepartmentId + 1;
-        } else {
-            deptId = 1;
-        }
-
-        return deptId;
     }
 }
 

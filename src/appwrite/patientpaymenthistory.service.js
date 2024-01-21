@@ -7,7 +7,7 @@ export class PatientPaymentHistoryService {
     client = new Client();
     databases;
     storage;
-    collectionId = config.appwriteCollectionId.split(',').find(pair => pair.includes('PatientPaymentHistory')).split(':')[1];
+    collectionId = null; //config.appwriteCollectionId.split(',').find(pair => pair.includes('PatientPaymentHistory')).split(':')[1];
 
     constructor() {
         this.client

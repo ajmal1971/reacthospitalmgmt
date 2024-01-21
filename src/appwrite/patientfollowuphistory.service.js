@@ -6,7 +6,7 @@ export class PatientFollowupHistoryService {
     client = new Client();
     databases;
     storage;
-    collectionId = config.appwriteCollectionId.split(',').find(pair => pair.includes('PatientFollowupHistory')).split(':')[1];
+    collectionId = null;// config.appwriteCollectionId.split(',').find(pair => pair.includes('PatientFollowupHistory')).split(':')[1];
 
     constructor() {
         this.client
