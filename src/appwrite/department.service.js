@@ -1,6 +1,6 @@
 /* eslint-disable no-useless-catch */
 import config from "../config/config";
-import { Client, ID, Databases, Storage, Query } from 'appwrite';
+import { Client, ID, Databases, Storage } from 'appwrite';
 import { notify } from "../shared/Utility";
 import { getRecordId } from "../shared/Utility";
 

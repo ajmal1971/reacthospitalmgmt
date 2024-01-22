@@ -3,11 +3,11 @@ import config from "../config/config";
 import { Client, ID, Databases, Storage } from 'appwrite';
 import { getRecordId } from "../shared/Utility";
 
-export class DoctorService {
+export class MedicineService {
     client = new Client();
     databases;
     storage;
-    collectionId = config.appwriteCollectionId.split(',').find(pair => pair.includes('Doctors')).split(':')[1];
+    collectionId = config.appwriteCollectionId.split(',').find(pair => pair.includes('Medicines')).split(':')[1];
 
     constructor() {
         this.client
@@ -18,58 +18,54 @@ export class DoctorService {
         this.storage = new Storage(this.client);
     }
 
-    async createDoctor({ Name, DepartmentId, Mobile, Specialization }) {
+    async createMedicine({ Name, Description }) {
         try {
-            const recordId = await getRecordId(this.getDoctors.bind(this));
+            const recordId = await getRecordId(this.getMedicines.bind(this));
             return await this.databases.createDocument(config.appwriteDatabaseId, this.collectionId, ID.unique(),
                 {
                     Name,
-                    Departments: DepartmentId,
-                    Mobile,
-                    Specialization,
+                    Description,
                     Id: recordId
                 }
             );
         } catch (error) {
-            console.log('Appwrite Service :: createDoctor :: error', error);
+            console.log('Appwrite Service :: createMedicine :: error', error);
         }
     }
 
-    async updateDoctor($id, { Name, DepartmentId, Mobile, Specialization }) {
+    async updateMedicine($id, { Name, Description }) {
         try {
             return await this.databases.updateDocument(config.appwriteDatabaseId, this.collectionId, $id,
                 {
                     Name,
-                    Departments: DepartmentId,
-                    Mobile,
-                    Specialization
+                    Description
                 }
             )
         } catch (error) {
-            console.log('Appwrite Service :: updateDoctor :: error', error);
+            console.log('Appwrite Service :: updateMedicine :: error', error);
         }
     }
 
-    async deleteDoctor($id) {
+    async deleteMedicine($id) {
         try {
             await this.databases.deleteDocument(config.appwriteDatabaseId, this.collectionId, $id);
             return true;
         } catch (error) {
-            console.log('Appwrite Service :: deleteDoctor :: error', error);
+            console.log('Appwrite Service :: deleteMedicine :: error', error);
             return false;
         }
     }
 
-    async getDoctors(quories = []) {
+    async getMedicines(quories = []) {
         try {
             return await this.databases.listDocuments(config.appwriteDatabaseId, this.collectionId, quories);
         } catch (error) {
-            console.log('Appwrite Service :: getDoctors :: error', error);
+            console.log('Appwrite Service :: getMedicines :: error', error);
             return false;
         }
     }
 }
 
-const doctorService = new DoctorService();
+const medicineService = new MedicineService();
 
-export default doctorService;
+export default medicineService;
