@@ -19,6 +19,7 @@ const CreateOrEditMedicine = () => {
             $id: switchData?.$id || null,
             Name: switchData?.Name || null,
             Description: switchData?.Description || null
+            
         }
     });
 
