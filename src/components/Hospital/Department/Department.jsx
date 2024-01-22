@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
-import { PageSwitch } from "../../shared/AppEnum";
-import {ManageDepartment, CreateOrEditDepartment} from "../index";
+import { PageSwitch } from "../../../shared/AppEnum";
+import {ManageDepartment, CreateOrEditDepartment} from "../../index";
 import { useSelector } from "react-redux";
 
 const Department = () => {

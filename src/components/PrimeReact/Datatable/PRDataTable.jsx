@@ -2,11 +2,11 @@
 import { useState } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import { DatatableSettings } from "../../shared/Constants";
-import { dateTimeFormat, dateFormat } from '../../shared/Utility.js';
-import { Button } from '../index.js';
+import { DatatableSettings } from "../../../shared/Constants";
+import { dateTimeFormat, dateFormat } from '../../../shared/Utility.js';
+import { Button } from '../../index.js';
 import { MultiSelect } from 'primereact/multiselect';
-import { DataType } from '../../shared/AppEnum.js';
+import { DataType } from '../../../shared/AppEnum.js';
 
 const PRDataTable = ({ value = [], loading = false, cols = [], actions = [] }) => {
     const [selectedOptions, setSelectedOptions] = useState(cols.filter(option => option.isSelected));

@@ -1,13 +1,13 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
-import { PageSwitch, DataType } from "../../shared/AppEnum";
-import departmentService from "../../appwrite/department.service";
+import { PageSwitch, DataType } from "../../../shared/AppEnum";
+import departmentService from "../../../appwrite/department.service";
 import { useDispatch, useSelector } from "react-redux";
-import { switchPage } from '../../store/pageSwitchSlice';
+import { switchPage } from '../../../store/pageSwitchSlice';
 import { Query } from 'appwrite';
-import { Input, PRDataTable, Button } from '../index';
-import { notify } from "../../shared/Utility";
-import { confirm } from "../../shared/Utility";
+import { Input, PRDataTable, Button } from '../../index';
+import { notify } from "../../../shared/Utility";
+import { confirm } from "../../../shared/Utility";
 
 
 const ManageDepartment = () => {

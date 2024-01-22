@@ -2,8 +2,8 @@
 import {useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { switchPage } from '../../store/pageSwitchSlice';
-import { PageSwitch } from '../../shared/AppEnum';
+import { switchPage } from '../../../store/pageSwitchSlice';
+import { PageSwitch } from '../../../shared/AppEnum';
 
 const NavGenerator = ({navItem}) => {
     const [dropdownOpen, setDropdownOpen] = useState(false);

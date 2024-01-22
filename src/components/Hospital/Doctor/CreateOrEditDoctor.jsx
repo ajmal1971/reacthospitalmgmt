@@ -1,13 +1,13 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Input, Button, PRAutoComplete } from '../index';
-import doctorService from '../../appwrite/doctor.service';
-import departmentService from '../../appwrite/department.service';
+import { Input, Button, PRAutoComplete } from '../../index';
+import doctorService from '../../../appwrite/doctor.service';
+import departmentService from '../../../appwrite/department.service';
 import { useDispatch, useSelector } from 'react-redux';
-import { switchPage } from '../../store/pageSwitchSlice';
-import { PageSwitch } from '../../shared/AppEnum';
-import { notify } from '../../shared/Utility';
+import { switchPage } from '../../../store/pageSwitchSlice';
+import { PageSwitch } from '../../../shared/AppEnum';
+import { notify } from '../../../shared/Utility';
 
 const CreateOrEditDoctor = () => {
     const dispatch = useDispatch();

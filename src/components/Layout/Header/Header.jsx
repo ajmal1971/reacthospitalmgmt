@@ -1,4 +1,4 @@
-import {NavGenerator} from '../index'
+import {NavGenerator} from '../../index.js'
 // import {useNavigate} from 'react-router-dom';
 
 const Header = () => {
@@ -19,22 +19,22 @@ const Header = () => {
             isChild: false,
             children: [
                 {
-                    name: 'Department',
-                    path: '/department',
+                    name: 'Departments',
+                    path: '/departments',
                     // active: !authStatus
                     isChild: true,
                     children: []
                 },
                 {
-                    name: 'Doctor',
-                    path: '/doctor',
+                    name: 'Doctors',
+                    path: '/doctors',
                     // active: !authStatus
                     isChild: true,
                     children: []
                 },
                 {
-                    name: 'Diagnosis',
-                    path: '/diagnosis',
+                    name: 'Medicines',
+                    path: '/medicines',
                     // active: !authStatus
                     isChild: true,
                     children: []
