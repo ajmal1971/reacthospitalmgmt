@@ -1,12 +1,13 @@
 /* eslint-disable no-useless-catch */
 import config from "../config/config";
 import { Client, ID, Databases, Storage, Query } from 'appwrite';
+import { getRecordId } from "../shared/Utility";
 
 export class PatientService {
     client = new Client();
     databases;
     storage;
-    collectionId = null// config.appwriteCollectionId.split(',').find(pair => pair.includes('Patient')).split(':')[1];
+    collectionId = config.appwriteCollectionId.split(',').find(pair => pair.includes('Patients')).split(':')[1];
 
     constructor() {
         this.client
@@ -17,17 +18,15 @@ export class PatientService {
         this.storage = new Storage(this.client);
     }
 
-    async createPatient({ Name, DateOfBirth, Address, Mobile, EmergencyContactNo }) {
+    async createPatient({ Name, DateOfBirth, Mobile }) {
         try {
-            const patientId = await this.getPatientId();
+            const recordId = await getRecordId(this.getPatients.bind(this));
             return await this.databases.createDocument(config.appwriteDatabaseId, this.collectionId, ID.unique(),
                 {
                     Name,
                     DateOfBirth,
-                    Address,
                     Mobile,
-                    EmergencyContactNo,
-                    PatientId: patientId
+                    Id: recordId
                 }
             );
         } catch (error) {
@@ -35,15 +34,13 @@ export class PatientService {
         }
     }
 
-    async updatePatient($id, { Name, DateOfBirth, Address, Mobile, EmergencyContactNo }) {
+    async updatePatient($id, { Name, DateOfBirth, Mobile }) {
         try {
             return await this.databases.updateDocument(config.appwriteDatabaseId, this.collectionId, $id,
                 {
                     Name,
                     DateOfBirth,
-                    Address,
-                    Mobile,
-                    EmergencyContactNo
+                    Mobile
                 }
             )
         } catch (error) {
@@ -68,18 +65,6 @@ export class PatientService {
             console.log('Appwrite Service :: getPatients :: error', error);
             return false;
         }
-    }
-
-    async getPatientId() {
-        let patId = 0;
-        const lastPat = await this.getPatients([Query.orderDesc('PatientId'), Query.limit(1)]);
-        if (lastPat.documents.length > 0) {
-            patId = lastPat.documents[0].PatientId + 1;
-        } else {
-            patId = 1;
-        }
-
-        return patId;
     }
 }
 
