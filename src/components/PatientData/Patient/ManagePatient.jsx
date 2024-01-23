@@ -1,12 +1,12 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
-import { PageSwitch } from "../../shared/AppEnum";
-import patientService from "../../appwrite/patient.service";
+import { PageSwitch } from "../../../shared/AppEnum";
+import patientService from "../../../appwrite/patient.service";
 import { useDispatch, useSelector } from "react-redux";
-import { switchPage } from '../../store/pageSwitchSlice';
+import { switchPage } from '../../../store/pageSwitchSlice';
 import { Query } from 'appwrite';
-import { Input, PRDataTable, Button } from '../index';
-import { notify, confirm } from "../../shared/Utility";
+import { Input, PRDataTable, Button } from '../../index';
+import { notify, confirm } from "../../../shared/Utility";
 
 const ManagePatient = () => {
     const [loading, setLoading] = useState(false);
@@ -19,8 +19,6 @@ const ManagePatient = () => {
         { field: 'Name', header: 'Name', dataType: 'string', isSelected: true },
         { field: 'DateOfBirth', header: 'Date Of Birth', dataType: 'date', isSelected: true },
         { field: 'Mobile', header: 'Mobile', dataType: 'string', isSelected: true },
-        { field: 'EmergencyContactNo', header: 'Emergency Contact', dataType: 'string', isSelected: true },
-        { field: 'Address', header: 'Address', dataType: 'string', isSelected: true },
         { field: '$createdAt', header: 'Created At', dataType: 'date', isSelected: false },
         { field: '$updatedAt', header: 'Updated At', dataType: 'date', isSelected: false }
     ];
@@ -33,10 +31,6 @@ const ManagePatient = () => {
 
         if (searchFilter.mobile && searchFilter.mobile.toString().trim() !== '') {
             queries.push(Query.equal('Mobile', searchFilter.mobile));
-        }
-
-        if (searchFilter.emergencyContact && searchFilter.emergencyContact.toString().trim() !== '') {
-            queries.push(Query.equal('EmergencyContactNo', searchFilter.emergencyContact));
         }
 
         getPatients(queries);
@@ -76,11 +70,11 @@ const ManagePatient = () => {
     }
 
     useEffect(() => {
-        if (switchData?.PatientId) {
-            const query = switchData?.PatientId ? [Query.equal('PatientId', switchData?.PatientId)] : [];
+        if (switchData?.Id) {
+            const query = switchData?.Id ? [Query.equal('Id', switchData?.Id)] : [];
             getPatients(query);
         }
-    }, [switchData?.PatientId]);
+    }, [switchData?.Id]);
 
     const actionFields = [
         { functionRef: editPatient, label: 'Edit' },
@@ -106,10 +100,6 @@ const ManagePatient = () => {
 
                     <div className="w-full md:w-3/12">
                         <Input label="Mobile" placeholder="Enter Patient Mobile" value={searchFilter.mobile} onChange={(e) => setSearchFilter((prev) => ({ ...prev, mobile: e.target.value }))} />
-                    </div>
-
-                    <div className="w-full md:w-3/12">
-                        <Input label="Emergency Contact" placeholder="Enter Patient Emergency Contact" value={searchFilter.emergencyContact} onChange={(e) => setSearchFilter((prev) => ({ ...prev, emergencyContact: e.target.value }))} />
                     </div>
 
                     <div className="w-full md:w-3/12">

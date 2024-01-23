@@ -1,12 +1,12 @@
 /* eslint-disable react/prop-types */
-import {useState, useEffect} from 'react';
-import {useForm} from 'react-hook-form';
-import {Input, Button, PRCalendar} from '../index';
-import patientService from '../../appwrite/patient.service';
+import { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { Input, Button, PRCalendar } from '../../index';
+import patientService from '../../../appwrite/patient.service';
 import { useDispatch, useSelector } from 'react-redux';
-import { switchPage } from '../../store/pageSwitchSlice';
-import { PageSwitch } from '../../shared/AppEnum';
-import { notify } from '../../shared/Utility';
+import { switchPage } from '../../../store/pageSwitchSlice';
+import { PageSwitch } from '../../../shared/AppEnum';
+import { notify } from '../../../shared/Utility';
 
 const CreateOrEditPatient = () => {
     const dispatch = useDispatch();
@@ -14,46 +14,44 @@ const CreateOrEditPatient = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [dateOfBirth, setDateOfBirth] = useState(null);
 
-    const {register, handleSubmit} = useForm({
+    const { register, handleSubmit } = useForm({
         defaultValues: {
             $id: switchData?.$id || null,
             Name: switchData?.Name || null,
-            Address: switchData?.Address || null,
-            Mobile: switchData?.Mobile || null,
-            EmergencyContactNo: switchData?.EmergencyContactNo || null
+            Mobile: switchData?.Mobile || null
         }
     });
 
     const submitForm = async (data) => {
         setIsLoading(true);
-        try{
+        try {
             if (switchData) {
-                patientService.updatePatient(switchData.$id, {...data, DateOfBirth: dateOfBirth})
+                patientService.updatePatient(switchData.$id, { ...data, DateOfBirth: dateOfBirth })
                     .finally(() => setIsLoading(false))
                     .then(res => {
                         if (res) {
                             notify.succes('Updated Successfully!');
-                            dispatch(switchPage({pageIndex: PageSwitch.ViewPage, switchData: res}));
+                            dispatch(switchPage({ pageIndex: PageSwitch.ViewPage, switchData: res }));
                         }
                     });
             } else {
-                patientService.createPatient({...data, DateOfBirth: dateOfBirth})
+                patientService.createPatient({ ...data, DateOfBirth: dateOfBirth })
                     .finally(() => setIsLoading(false))
                     .then(res => {
                         if (res) {
                             notify.succes('Created Successfully!');
-                            dispatch(switchPage({pageIndex: PageSwitch.ViewPage, switchData: res}));
+                            dispatch(switchPage({ pageIndex: PageSwitch.ViewPage, switchData: res }));
                         }
                     });
             }
         }
-        catch(error) {
+        catch (error) {
             notify.error();
         }
     }
 
     const navigateBack = () => {
-        dispatch(switchPage({pageIndex: PageSwitch.ViewPage, switchData: null}));
+        dispatch(switchPage({ pageIndex: PageSwitch.ViewPage, switchData: null }));
     }
 
     useEffect(() => {
@@ -87,16 +85,6 @@ const CreateOrEditPatient = () => {
                             <div className='flex flex-wrap'>
                                 <div className='w-full md:w-1/2 px-2'>
                                     <Input label="Mobile" placeholder="Enter Mobile" className="mb-4" {...register("Mobile", { required: true })} />
-                                </div>
-
-                                <div className='w-full md:w-1/2 px-2'>
-                                    <Input label="Emergency Contact" placeholder="Enter Emergency Contact" className="mb-4" {...register("EmergencyContactNo")} />
-                                </div>
-                            </div>
-
-                            <div className='flex flex-wrap'>
-                                <div className='w-full px-2'>
-                                    <Input label="Address" placeholder="Enter Address" className="mb-4" {...register("Address", { required: true })} />
                                 </div>
                             </div>
 
