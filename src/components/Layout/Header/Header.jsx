@@ -54,15 +54,8 @@ const Header = () => {
                     children: []
                 },
                 {
-                    name: 'Patient History',
-                    path: '/patient-history',
-                    // active: !authStatus
-                    isChild: true,
-                    children: []
-                },
-                {
-                    name: 'Patient Followup History',
-                    path: '/patient-followup-history',
+                    name: 'Appointment',
+                    path: '/appointment',
                     // active: !authStatus
                     isChild: true,
                     children: []

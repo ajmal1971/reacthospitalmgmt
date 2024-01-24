@@ -31,8 +31,11 @@ import CreateOrEditPatientFollowupHistory from './PatientFollowupHistory/CreateO
 import Medicine from './Hospital/Medicine/Medicine';
 import ManageMedicine from './Hospital/Medicine/ManageMedicine';
 import CreateOrEditMedicine from './Hospital/Medicine/CreateOrEditMedicine';
+import Appointment from './PatientData/Appointment/Appointment';
+import ManageAppointment from './PatientData/Appointment/ManageAppointment';
+import CreateOrEditAppointment from './PatientData/Appointment/CreateOrEditAppointment';
 
 export {
     Input, Button, Department, Signup, Login, Header, NavGenerator, RouterGuard, Footer, Home, CreateOrEditDepartment,
-    ManageDepartment, PRDataTable, ManageDoctor, CreateOrEditDoctor, Doctor, PRAutoComplete, Diagnosis, ManageDiagnosis, CreateOrEditDiagnosis, Patient, ManagePatient, CreateOrEditPatient, PRCalendar, PatientHistory, ManagePatientHistory, CreateOrEditPatientHistory, PatientFollowupHistory, ManagePatientFollowupHistory, CreateOrEditPatientFollowupHistory, Medicine, ManageMedicine, CreateOrEditMedicine
+    ManageDepartment, PRDataTable, ManageDoctor, CreateOrEditDoctor, Doctor, PRAutoComplete, Diagnosis, ManageDiagnosis, CreateOrEditDiagnosis, Patient, ManagePatient, CreateOrEditPatient, PRCalendar, PatientHistory, ManagePatientHistory, CreateOrEditPatientHistory, PatientFollowupHistory, ManagePatientFollowupHistory, CreateOrEditPatientFollowupHistory, Medicine, ManageMedicine, CreateOrEditMedicine, Appointment, ManageAppointment, CreateOrEditAppointment
 }

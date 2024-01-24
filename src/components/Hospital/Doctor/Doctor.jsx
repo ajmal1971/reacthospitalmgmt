@@ -6,8 +6,6 @@ import {ManageDoctor, CreateOrEditDoctor} from '../../index.js';
 const Doctor = () => {
     const pageIndex = useSelector(state => state.pageSwitch.pageIndex);
 
-    console.log(pageIndex);
-
     return pageIndex === PageSwitch.ViewPage ? <ManageDoctor/> : <CreateOrEditDoctor/>;
 };
 
