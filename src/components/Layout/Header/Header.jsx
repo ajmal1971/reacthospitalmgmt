@@ -59,6 +59,13 @@ const Header = () => {
                     // active: !authStatus
                     isChild: true,
                     children: []
+                },
+                {
+                    name: 'Medical Record',
+                    path: '/medical-record',
+                    // active: !authStatus
+                    isChild: true,
+                    children: []
                 }
             ]
         },

@@ -1,12 +1,16 @@
 /* eslint-disable react/prop-types */
-import { PageSwitch } from "../../../shared/AppEnum";
-import {ManageDepartment, CreateOrEditDepartment} from "../../index";
-import { useSelector } from "react-redux";
+import { useSelector } from 'react-redux'
+import { PageSwitch } from '../../../shared/AppEnum'
+import { ManageDepartment, CreateOrEditDepartment } from '../../index'
 
-const Department = () => {
-    const pageIndex = useSelector(state => state.pageSwitch.pageIndex);
+function Department() {
+  const pageIndex = useSelector((state) => state.pageSwitch.pageIndex)
 
-    return pageIndex === PageSwitch.ViewPage ? <ManageDepartment/> : <CreateOrEditDepartment/>;
-};
+  return pageIndex === PageSwitch.ViewPage ? (
+    <ManageDepartment />
+  ) : (
+    <CreateOrEditDepartment />
+  )
+}
 
-export default Department;
+export default Department

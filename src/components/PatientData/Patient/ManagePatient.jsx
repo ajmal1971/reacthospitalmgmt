@@ -7,6 +7,7 @@ import { switchPage } from '../../../store/pageSwitchSlice';
 import { Query } from 'appwrite';
 import { Input, PRDataTable, Button } from '../../index';
 import { notify, confirm } from "../../../shared/Utility";
+import { DataType } from "../../../shared/AppEnum";
 
 const ManagePatient = () => {
     const [loading, setLoading] = useState(false);
@@ -16,11 +17,11 @@ const ManagePatient = () => {
     const [searchFilter, setSearchFilter] = useState({ name: '', mobile: '', emergencyContact: '' });
 
     const cols = [
-        { field: 'Name', header: 'Name', dataType: 'string', isSelected: true },
-        { field: 'DateOfBirth', header: 'Date Of Birth', dataType: 'date', isSelected: true },
-        { field: 'Mobile', header: 'Mobile', dataType: 'string', isSelected: true },
-        { field: '$createdAt', header: 'Created At', dataType: 'date', isSelected: false },
-        { field: '$updatedAt', header: 'Updated At', dataType: 'date', isSelected: false }
+        { field: 'Name', header: 'Name', dataType: DataType.string, isSelected: true },
+        { field: 'DateOfBirth', header: 'Date Of Birth', dataType: DataType.date, isSelected: true },
+        { field: 'Mobile', header: 'Mobile', dataType: DataType.string, isSelected: true },
+        { field: '$createdAt', header: 'Created At', dataType: DataType.dateTime, isSelected: false },
+        { field: '$updatedAt', header: 'Updated At', dataType: DataType.dateTime, isSelected: false }
     ];
 
     const search = () => {
