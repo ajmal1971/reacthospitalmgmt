@@ -27,6 +27,7 @@ import TextEditor from "./Utilities/TextEditor";
 import MedicalRecord from "./PatientData/MedicalRecord/MedicalRecord";
 import ManageMedicalRecord from "./PatientData/MedicalRecord/ManageMedicalRecord";
 import CreateOrEditMedicalRecord from "./PatientData/MedicalRecord/CreateOrEditMedicalRecord";
+import TextArea from "./Utilities/TextArea";
 
 export {
   Input,
@@ -58,4 +59,5 @@ export {
   MedicalRecord,
   ManageMedicalRecord,
   CreateOrEditMedicalRecord,
+  TextArea
 };

@@ -7,9 +7,10 @@ import appointmentService from "../../../appwrite/appointment.service";
 import { useDispatch, useSelector } from "react-redux";
 import { switchPage } from "../../../store/pageSwitchSlice";
 import { Query } from "appwrite";
-import { PRDataTable, PRAutoComplete, Button } from "../../index";
+import { PRDataTable, PRAutoComplete, Button, TextArea, TextEditor } from "../../index";
 import { notify, confirm } from "../../../shared/Utility";
 import medicalRecordService from "../../../appwrite/medicalrecord.service";
+import { useForm } from "react-hook-form";
 
 const CreateOrEditMedicalRecord = () => {
   const dispatch = useDispatch();
@@ -27,6 +28,14 @@ const CreateOrEditMedicalRecord = () => {
 
   const [selectedRecord, setSelectedRecord] = useState(undefined);
   const [showCreateField, setShowCreateField] = useState(false);
+
+  const { register, handleSubmit, control, getValues } = useForm({
+    defaultValues: {
+      $id: switchData?.$id || null,
+      Symptoms: switchData?.Symptoms || '',
+      Diagnosis: switchData?.Diagnosis || 'active'
+    }
+  });
 
   const cols = [
     {
@@ -91,6 +100,34 @@ const CreateOrEditMedicalRecord = () => {
     });
   };
 
+  const submit = async (data) => {
+    setLoading(true);
+    try {
+      if (switchData) {
+        medicalRecordService.updateMedicalRecord(switchData.$id, { ...data, PatientId: selectedPatient.$id, DoctorId: selectedDoctor.$id })
+          .finally(() => setLoading(false))
+          .then(res => {
+            if (res) {
+              notify.succes('Updated Successfully!');
+              dispatch(switchPage({ pageIndex: PageSwitch.ViewPage, switchData: res }));
+            }
+          });
+      } else {
+        medicalRecordService.createMedicalRecord({ ...data, PatientId: selectedPatient.$id, DoctorId: selectedDoctor.$id })
+          .finally(() => setLoading(false))
+          .then(res => {
+            if (res) {
+              notify.succes('Created Successfully!');
+              dispatch(switchPage({ pageIndex: PageSwitch.ViewPage, switchData: res }));
+            }
+          });
+      }
+    }
+    catch (error) {
+      notify.error();
+    }
+  }
+
   const getMedicalRecords = (queries = []) => {
     medicalRecordService.getMedicalRecords(queries).then((res) => {
       if (res.documents) {
@@ -111,12 +148,18 @@ const CreateOrEditMedicalRecord = () => {
       patientService.getPatients([]).then((res) => {
         if (res.documents) {
           setPatients(res.documents);
+          if (switchData) {
+            setSelectedPatient(res.documents.find(item => item.$id === switchData?.Patients.$id));
+          }
         }
       });
 
       doctorService.getDoctors([]).then((res) => {
         if (res.documents) {
           setDoctors(res.documents);
+          if (switchData) {
+            setSelectedDoctor(res.documents.find(item => item.$id === switchData?.Doctors.$id));
+          }
         }
       });
     }
@@ -187,67 +230,31 @@ const CreateOrEditMedicalRecord = () => {
 
       {showCreateField ? (
         <>
-          <div className="flex flex-row items-center justify-center px-6 py-2">
-            <div className="w-full max-w-screen-xl mx-auto bg-white rounded-lg md:mt-0 sm:max-w-2xl xl:p-0 border border-gray-300 shadow-xl shadow-cyan-200">
-              <div className="w-10/12 p-6 space-y-4 md:space-y-6 sm:p-8">
-                <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-                  Create Medical Record
-                </h1>
-                {/* <form onSubmit={handleSubmit(submitForm)} action="#">
-                  <div className="flex flex-wrap">
-                    <div className="w-full md:w-1/2 px-2">
-                      <PRAutoComplete
-                        items={departments}
-                        selectedItem={selectedDepartment}
-                        setSelectedItem={setSelectedDepartment}
-                        property="Name"
-                        label="Department"
-                      />
-                    </div>
+          <div className="flex justify-center mt-3">
+            <div className="w-10/12 flex flex-col shadow-md shadow-cyan-200 border border-gray-300 rounded-md">
+              <h1 className="text-xl p-3 mx-auto text-center font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white mb-2">
+                Create Medical Record
+              </h1>
 
-                    <div className="w-full md:w-1/2 px-2">
-                      <Input
-                        label="Name"
-                        placeholder="Enter Doctor Name"
-                        className="mb-4"
-                        {...register("Name", { required: true })}
-                      />
-                    </div>
-                  </div>
+              <form onSubmit={handleSubmit(submit)}>
+                <div className="mb-4 w-full p-2">
+                  <TextArea
+                    label="Symptoms"
+                    placeholder="Enter Symptoms"
+                    {...register("Symptoms", { required: true })}
+                  />
+                </div>
 
-                  <div className="flex flex-wrap">
-                    <div className="w-full md:w-1/2 px-2">
-                      <Input
-                        label="Mobile"
-                        placeholder="Enter Mobile"
-                        className="mb-4"
-                        {...register("Mobile", { required: true })}
-                      />
-                    </div>
+                <div className="mb-4 w-full p-2">
+                  <TextEditor label="Diagnosis" name="content" control={control} defaultValue={getValues("content")} />
+                </div>
 
-                    <div className="w-full md:w-1/2 px-2">
-                      <Input
-                        label="Specialization"
-                        placeholder="Enter Specialization"
-                        className="mb-4"
-                        {...register("Specialization", { required: true })}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap">
-                    <div className="w-2/3 px-2 mx-auto">
-                      <Button
-                        type="submit"
-                        className="w-full"
-                        isLoading={isLoading}
-                      >
-                        {switchData ? "Update" : "Submit"}
-                      </Button>
-                    </div>
-                  </div>
-                </form> */}
-              </div>
+                <div className="mb-4 w-full p-2">
+                  <Button type="submit" className="w-full" isLoading={loading}>
+                    {switchData ? "Update" : "Submit"}
+                  </Button>
+                </div>
+              </form>
             </div>
           </div>
         </>
