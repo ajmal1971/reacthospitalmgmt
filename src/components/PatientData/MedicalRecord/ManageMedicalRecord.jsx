@@ -46,13 +46,13 @@ const ManageMedicalRecord = () => {
       field: "Symptoms",
       header: "Symptoms",
       dataType: DataType.string,
-      isSelected: true,
+      isSelected: false,
     },
     {
       field: "Diagnosis",
       header: "Diagnosis",
       dataType: DataType.string,
-      isSelected: true,
+      isSelected: false,
     },
     {
       field: "$createdAt",

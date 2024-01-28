@@ -3,12 +3,20 @@ import { useEffect, useState } from "react";
 import { PageSwitch, DataType } from "../../../shared/AppEnum";
 import patientService from "../../../appwrite/patient.service";
 import doctorService from "../../../appwrite/doctor.service";
+import medicineService from "../../../appwrite/medicine.service";
 import appointmentService from "../../../appwrite/appointment.service";
 import { useDispatch, useSelector } from "react-redux";
 import { switchPage } from "../../../store/pageSwitchSlice";
 import { Query } from "appwrite";
-import { PRDataTable, PRAutoComplete, Button, TextArea, TextEditor } from "../../index";
-import { notify, confirm } from "../../../shared/Utility";
+import {
+  PRDataTable,
+  PRAutoComplete,
+  Button,
+  TextArea,
+  TextEditor,
+  Input,
+} from "../../index";
+import { notify } from "../../../shared/Utility";
 import medicalRecordService from "../../../appwrite/medicalrecord.service";
 import { useForm } from "react-hook-form";
 
@@ -26,15 +34,22 @@ const CreateOrEditMedicalRecord = () => {
   const [doctors, setDoctors] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState(undefined);
 
+  const [medicines, setMedicines] = useState([]);
+  const [selectedMedicine, setSelectedMedicine] = useState(undefined);
+
   const [selectedRecord, setSelectedRecord] = useState(undefined);
   const [showCreateField, setShowCreateField] = useState(false);
+
+  const [prescriptions, setPrescriptions] = useState([]);
+
+  const [dosage, setDosage] = useState("");
 
   const { register, handleSubmit, control, getValues } = useForm({
     defaultValues: {
       $id: switchData?.$id || null,
-      Symptoms: switchData?.Symptoms || '',
-      Diagnosis: switchData?.Diagnosis || 'active'
-    }
+      Symptoms: switchData?.Symptoms || "",
+      Diagnosis: switchData?.Diagnosis || "",
+    },
   });
 
   const cols = [
@@ -76,6 +91,21 @@ const CreateOrEditMedicalRecord = () => {
     },
   ];
 
+  const colsPresc = [
+    {
+      field: "Medicine.Name",
+      header: "Medicine",
+      dataType: DataType.string,
+      isSelected: true,
+    },
+    {
+      field: "Dosage",
+      header: "Dosage",
+      dataType: DataType.string,
+      isSelected: true,
+    },
+  ];
+
   const search = () => {
     const queries = [];
 
@@ -101,32 +131,46 @@ const CreateOrEditMedicalRecord = () => {
   };
 
   const submit = async (data) => {
+    console.log(data);
     setLoading(true);
     try {
       if (switchData) {
-        medicalRecordService.updateMedicalRecord(switchData.$id, { ...data, PatientId: selectedPatient.$id, DoctorId: selectedDoctor.$id })
+        medicalRecordService
+          .updateMedicalRecord(switchData.$id, {
+            ...data,
+            PatientId: selectedPatient.$id,
+            DoctorId: selectedDoctor.$id,
+          })
           .finally(() => setLoading(false))
-          .then(res => {
+          .then((res) => {
             if (res) {
-              notify.succes('Updated Successfully!');
-              dispatch(switchPage({ pageIndex: PageSwitch.ViewPage, switchData: res }));
+              notify.succes("Updated Successfully!");
+              dispatch(
+                switchPage({ pageIndex: PageSwitch.ViewPage, switchData: res })
+              );
             }
           });
       } else {
-        medicalRecordService.createMedicalRecord({ ...data, PatientId: selectedPatient.$id, DoctorId: selectedDoctor.$id })
+        medicalRecordService
+          .createMedicalRecord({
+            ...data,
+            PatientId: selectedPatient.$id,
+            DoctorId: selectedDoctor.$id,
+          })
           .finally(() => setLoading(false))
-          .then(res => {
+          .then((res) => {
             if (res) {
-              notify.succes('Created Successfully!');
-              dispatch(switchPage({ pageIndex: PageSwitch.ViewPage, switchData: res }));
+              notify.succes("Created Successfully!");
+              dispatch(
+                switchPage({ pageIndex: PageSwitch.ViewPage, switchData: res })
+              );
             }
           });
       }
-    }
-    catch (error) {
+    } catch (error) {
       notify.error();
     }
-  }
+  };
 
   const getMedicalRecords = (queries = []) => {
     medicalRecordService.getMedicalRecords(queries).then((res) => {
@@ -140,7 +184,34 @@ const CreateOrEditMedicalRecord = () => {
     setShowCreateField(true);
   };
 
+  const removeMedicine = (rowData) => {
+    const newPrec = prescriptions.filter(
+      (item) => item.Medicine.$id !== rowData.Medicine.$id
+    );
+    setPrescriptions([...newPrec]);
+  };
+
+  const addMedicineToList = () => {
+    setPrescriptions((prev) => [
+      ...prev,
+      { Medicine: selectedMedicine, Dosage: dosage },
+    ]);
+
+    setSelectedMedicine(undefined);
+    setDosage("");
+  };
+
+  const isFormValid = () => {
+    return selectedPatient && selectedDoctor;
+  };
+
   useEffect(() => {
+    medicineService.getMedicines([]).then((res) => {
+      if (res.documents) {
+        setMedicines(res.documents);
+      }
+    });
+
     if (switchData?.Id) {
       const query = switchData?.Id ? [Query.equal("Id", switchData?.Id)] : [];
       getMedicalRecords(query);
@@ -149,7 +220,11 @@ const CreateOrEditMedicalRecord = () => {
         if (res.documents) {
           setPatients(res.documents);
           if (switchData) {
-            setSelectedPatient(res.documents.find(item => item.$id === switchData?.Patients.$id));
+            setSelectedPatient(
+              res.documents.find(
+                (item) => item.$id === switchData?.Patients.$id
+              )
+            );
           }
         }
       });
@@ -158,12 +233,14 @@ const CreateOrEditMedicalRecord = () => {
         if (res.documents) {
           setDoctors(res.documents);
           if (switchData) {
-            setSelectedDoctor(res.documents.find(item => item.$id === switchData?.Doctors.$id));
+            setSelectedDoctor(
+              res.documents.find((item) => item.$id === switchData?.Doctors.$id)
+            );
           }
         }
       });
     }
-  }, [switchData?.Id]);
+  }, [switchData]);
 
   const actionFields = [{ functionRef: createMedicalRecord, label: "Create" }];
 
@@ -194,6 +271,7 @@ const CreateOrEditMedicalRecord = () => {
                   setSelectedItem={setSelectedDoctor}
                   property="Name"
                   label="Doctor"
+                  disabled={appointments.length > 0}
                 />
               </div>
 
@@ -204,11 +282,16 @@ const CreateOrEditMedicalRecord = () => {
                   setSelectedItem={setSelectedPatient}
                   property="Name"
                   label="Patient"
+                  disabled={appointments.length > 0}
                 />
               </div>
 
               <div className="w-full md:w-3/12">
-                <Button onClickEvent={search} className="mt-7">
+                <Button
+                  onClickEvent={search}
+                  className="mt-7"
+                  disabled={!isFormValid()}
+                >
                   Search
                 </Button>
               </div>
@@ -246,8 +329,52 @@ const CreateOrEditMedicalRecord = () => {
                 </div>
 
                 <div className="mb-4 w-full p-2">
-                  <TextEditor label="Diagnosis" name="content" control={control} defaultValue={getValues("content")} />
+                  <TextEditor
+                    label="Diagnosis"
+                    name="Diagnosis"
+                    control={control}
+                    defaultValue={getValues("Diagnosis")}
+                  />
                 </div>
+
+                <div className="mb-4 w-full p-2 flex flex-row gap-2">
+                  <PRAutoComplete
+                    items={medicines}
+                    selectedItem={selectedMedicine}
+                    setSelectedItem={setSelectedMedicine}
+                    property="Name"
+                    label="Medicine"
+                  />
+
+                  <Input
+                    label="Dosage"
+                    placeholder="Enter Dosage"
+                    value={dosage}
+                    onChange={(e) => setDosage(e.target.value)}
+                  />
+
+                  <Button
+                    className="w-3/12"
+                    isLoading={loading}
+                    disabled={!selectedMedicine || !dosage}
+                    onClickEvent={addMedicineToList}
+                  >
+                    Add
+                  </Button>
+                </div>
+
+                {medicines.length > 0 ? (
+                  <div className="mb-4 w-full p-2">
+                    <PRDataTable
+                      value={prescriptions}
+                      loading={loading}
+                      cols={colsPresc}
+                      actions={[
+                        { functionRef: removeMedicine, label: "Remove" },
+                      ]}
+                    />
+                  </div>
+                ) : null}
 
                 <div className="mb-4 w-full p-2">
                   <Button type="submit" className="w-full" isLoading={loading}>
