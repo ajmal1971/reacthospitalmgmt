@@ -131,7 +131,6 @@ const CreateOrEditMedicalRecord = () => {
   };
 
   const submit = async (data) => {
-    console.log(data);
     setLoading(true);
     try {
       if (switchData) {
@@ -156,6 +155,7 @@ const CreateOrEditMedicalRecord = () => {
             ...data,
             PatientId: selectedPatient.$id,
             DoctorId: selectedDoctor.$id,
+            prescriptions
           })
           .finally(() => setLoading(false))
           .then((res) => {

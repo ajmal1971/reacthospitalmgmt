@@ -1,13 +1,15 @@
 /* eslint-disable no-useless-catch */
 import config from "../config/config";
-import { Client, ID, Databases, Storage } from 'appwrite';
+import { Client, ID, Databases, Storage, Query } from 'appwrite';
 import { getRecordId } from "../shared/Utility";
+import prescriptionService from "./prescription.service";
 
 export class MedicalRecordService {
     client = new Client();
     databases;
     storage;
     collectionId = config.appwriteCollectionId.split(',').find(pair => pair.includes('MedicalRecords')).split(':')[1];
+    prescCollectionId = config.appwriteCollectionId.split(',').find(pair => pair.includes('Prescriptions')).split(':')[1];
 
     constructor() {
         this.client
@@ -18,10 +20,10 @@ export class MedicalRecordService {
         this.storage = new Storage(this.client);
     }
 
-    async createMedicalRecord({ PatientId, DoctorId, Symptoms, Diagnosis }) {
+    async createMedicalRecord({ PatientId, DoctorId, Symptoms, Diagnosis, prescriptions = [] }) {
         try {
             const recordId = await getRecordId(this.getMedicalRecords.bind(this));
-            return await this.databases.createDocument(config.appwriteDatabaseId, this.collectionId, ID.unique(),
+            const result = await this.databases.createDocument(config.appwriteDatabaseId, this.collectionId, ID.unique(),
                 {
                     Patients: PatientId,
                     Doctors: DoctorId,
@@ -30,6 +32,21 @@ export class MedicalRecordService {
                     Id: recordId
                 }
             );
+
+            if (prescriptions.length > 0) {
+                prescriptions.forEach(async item => {
+                    await this.databases.createDocument(config.appwriteDatabaseId, this.prescCollectionId, ID.unique(),
+                        {
+                            MedicalRecords: result.$id,
+                            Medicines: item.Medicine.$id,
+                            Dosage: item.Dosage,
+                            Id: recordId
+                        }
+                    );
+                });
+            }
+
+            return result;
         } catch (error) {
             console.log('Appwrite Service :: createMedicalRecord :: error', error);
         }
@@ -52,7 +69,17 @@ export class MedicalRecordService {
 
     async deleteMedicalRecord($id) {
         try {
+            const result = await prescriptionService.getPrescriptions([Query.equal('MedicalRecords', $id)]);
+
+            if (result && result.documents.length > 0) {
+                result.documents.forEach(async item => {
+                    await prescriptionService.deletePrescription(item.$id);
+                });
+            }
+
+
             await this.databases.deleteDocument(config.appwriteDatabaseId, this.collectionId, $id);
+
             return true;
         } catch (error) {
             console.log('Appwrite Service :: deleteMedicalRecord :: error', error);
@@ -68,6 +95,23 @@ export class MedicalRecordService {
             return false;
         }
     }
+
+    async getRecordDetails(recordId) {
+        try {
+            const medicalRecord = await this.getMedicalRecords([Query.equal('$id', recordId)]);
+            const prescriptions = await prescriptionService.getPrescriptions([Query.equal('MedicalRecords', recordId)]);
+            const result = {
+                ...medicalRecord.documents[0],
+                prescriptions: prescriptions.documents
+            }
+
+            return result;
+        } catch (error) {
+            console.error('Appwrite Service :: getRecordDetails :: error', error);
+            return false;
+        }
+    }
+
 }
 
 const medicalRecordService = new MedicalRecordService();
