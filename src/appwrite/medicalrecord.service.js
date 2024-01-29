@@ -1,117 +1,152 @@
 /* eslint-disable no-useless-catch */
 import config from "../config/config";
-import { Client, ID, Databases, Storage, Query } from 'appwrite';
+import { Client, ID, Databases, Storage, Query } from "appwrite";
 import { getRecordId } from "../shared/Utility";
 import prescriptionService from "./prescription.service";
 
 export class MedicalRecordService {
-    client = new Client();
-    databases;
-    storage;
-    collectionId = config.appwriteCollectionId.split(',').find(pair => pair.includes('MedicalRecords')).split(':')[1];
-    prescCollectionId = config.appwriteCollectionId.split(',').find(pair => pair.includes('Prescriptions')).split(':')[1];
+  client = new Client();
+  databases;
+  storage;
+  collectionId = config.appwriteCollectionId
+    .split(",")
+    .find((pair) => pair.includes("MedicalRecords"))
+    .split(":")[1];
+  prescCollectionId = config.appwriteCollectionId
+    .split(",")
+    .find((pair) => pair.includes("Prescriptions"))
+    .split(":")[1];
 
-    constructor() {
-        this.client
-            .setEndpoint(config.appwriteUrl)
-            .setProject(config.appwriteProjectId);
+  constructor() {
+    this.client
+      .setEndpoint(config.appwriteUrl)
+      .setProject(config.appwriteProjectId);
 
-        this.databases = new Databases(this.client);
-        this.storage = new Storage(this.client);
-    }
+    this.databases = new Databases(this.client);
+    this.storage = new Storage(this.client);
+  }
 
-    async createMedicalRecord({ PatientId, DoctorId, Symptoms, Diagnosis, prescriptions = [] }) {
-        try {
-            const recordId = await getRecordId(this.getMedicalRecords.bind(this));
-            const result = await this.databases.createDocument(config.appwriteDatabaseId, this.collectionId, ID.unique(),
-                {
-                    Patients: PatientId,
-                    Doctors: DoctorId,
-                    Symptoms,
-                    Diagnosis,
-                    Id: recordId
-                }
-            );
+  async createMedicalRecord({
+    PatientId,
+    DoctorId,
+    Symptoms,
+    Diagnosis,
+    prescriptions = [],
+  }) {
+    try {
+      const recordId = await getRecordId(this.getMedicalRecords.bind(this));
+      const result = await this.databases.createDocument(
+        config.appwriteDatabaseId,
+        this.collectionId,
+        ID.unique(),
+        {
+          Patients: PatientId,
+          Doctors: DoctorId,
+          Symptoms,
+          Diagnosis,
+          Id: recordId,
+        }
+      );
 
-            if (prescriptions.length > 0) {
-                prescriptions.forEach(async item => {
-                    await this.databases.createDocument(config.appwriteDatabaseId, this.prescCollectionId, ID.unique(),
-                        {
-                            MedicalRecords: result.$id,
-                            Medicines: item.Medicine.$id,
-                            Dosage: item.Dosage,
-                            Id: recordId
-                        }
-                    );
-                });
+      if (prescriptions.length > 0) {
+        prescriptions.forEach(async (item) => {
+          await this.databases.createDocument(
+            config.appwriteDatabaseId,
+            this.prescCollectionId,
+            ID.unique(),
+            {
+              MedicalRecords: result.$id,
+              Medicines: item.Medicine.$id,
+              Dosage: item.Dosage,
+              Id: recordId,
             }
+          );
+        });
+      }
 
-            return result;
-        } catch (error) {
-            console.log('Appwrite Service :: createMedicalRecord :: error', error);
-        }
+      return result;
+    } catch (error) {
+      console.log("Appwrite Service :: createMedicalRecord :: error", error);
     }
+  }
 
-    async updateMedicalRecord($id, { PatientId, DoctorId, Symptoms, Diagnosis }) {
-        try {
-            return await this.databases.updateDocument(config.appwriteDatabaseId, this.collectionId, $id,
-                {
-                    Patients: PatientId,
-                    Doctors: DoctorId,
-                    Symptoms,
-                    Diagnosis
-                }
-            )
-        } catch (error) {
-            console.log('Appwrite Service :: updateMedicalRecord :: error', error);
+  async updateMedicalRecord($id, { PatientId, DoctorId, Symptoms, Diagnosis }) {
+    try {
+      return await this.databases.updateDocument(
+        config.appwriteDatabaseId,
+        this.collectionId,
+        $id,
+        {
+          Patients: PatientId,
+          Doctors: DoctorId,
+          Symptoms,
+          Diagnosis,
         }
+      );
+    } catch (error) {
+      console.log("Appwrite Service :: updateMedicalRecord :: error", error);
     }
+  }
 
-    async deleteMedicalRecord($id) {
-        try {
-            const result = await prescriptionService.getPrescriptions([Query.equal('MedicalRecords', $id)]);
+  async deleteMedicalRecord($id) {
+    try {
+      const result = await prescriptionService.getPrescriptions([
+        Query.equal("MedicalRecords", $id),
+      ]);
 
-            if (result && result.documents.length > 0) {
-                result.documents.forEach(async item => {
-                    await prescriptionService.deletePrescription(item.$id);
-                });
-            }
+      if (result && result.documents.length > 0) {
+        await Promise.all(
+          result.documents.map(async (item) => {
+            await prescriptionService.deletePrescription(item.$id);
+          })
+        );
+      }
 
+      await this.databases.deleteDocument(
+        config.appwriteDatabaseId,
+        this.collectionId,
+        $id
+      );
 
-            await this.databases.deleteDocument(config.appwriteDatabaseId, this.collectionId, $id);
-
-            return true;
-        } catch (error) {
-            console.log('Appwrite Service :: deleteMedicalRecord :: error', error);
-            return false;
-        }
+      return true;
+    } catch (error) {
+      console.log("Appwrite Service :: deleteMedicalRecord :: error", error);
+      return false;
     }
+  }
 
-    async getMedicalRecords(quories = []) {
-        try {
-            return await this.databases.listDocuments(config.appwriteDatabaseId, this.collectionId, quories);
-        } catch (error) {
-            console.log('Appwrite Service :: getMedicalRecords :: error', error);
-            return false;
-        }
+  async getMedicalRecords(quories = []) {
+    try {
+      return await this.databases.listDocuments(
+        config.appwriteDatabaseId,
+        this.collectionId,
+        quories
+      );
+    } catch (error) {
+      console.log("Appwrite Service :: getMedicalRecords :: error", error);
+      return false;
     }
+  }
 
-    async getRecordDetails(recordId) {
-        try {
-            const medicalRecord = await this.getMedicalRecords([Query.equal('$id', recordId)]);
-            const prescriptions = await prescriptionService.getPrescriptions([Query.equal('MedicalRecords', recordId)]);
-            const result = {
-                ...medicalRecord.documents[0],
-                prescriptions: prescriptions.documents
-            }
+  async getRecordDetails(recordId) {
+    try {
+      const medicalRecord = await this.getMedicalRecords([
+        Query.equal("$id", recordId),
+      ]);
+      const prescriptions = await prescriptionService.getPrescriptions([
+        Query.equal("MedicalRecords", recordId),
+      ]);
+      const result = {
+        ...medicalRecord.documents[0],
+        prescriptions: prescriptions.documents,
+      };
 
-            return result;
-        } catch (error) {
-            console.error('Appwrite Service :: getRecordDetails :: error', error);
-            return false;
-        }
+      return result;
+    } catch (error) {
+      console.error("Appwrite Service :: getRecordDetails :: error", error);
+      return false;
     }
-
+  }
 }
 
 const medicalRecordService = new MedicalRecordService();

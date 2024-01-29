@@ -37,7 +37,7 @@ const CreateOrEditMedicalRecord = () => {
   const [medicines, setMedicines] = useState([]);
   const [selectedMedicine, setSelectedMedicine] = useState(undefined);
 
-  const [selectedRecord, setSelectedRecord] = useState(undefined);
+  // const [selectedRecord, setSelectedRecord] = useState(undefined);
   const [showCreateField, setShowCreateField] = useState(false);
 
   const [prescriptions, setPrescriptions] = useState([]);
@@ -91,21 +91,6 @@ const CreateOrEditMedicalRecord = () => {
     },
   ];
 
-  const colsPresc = [
-    {
-      field: "Medicine.Name",
-      header: "Medicine",
-      dataType: DataType.string,
-      isSelected: true,
-    },
-    {
-      field: "Dosage",
-      header: "Dosage",
-      dataType: DataType.string,
-      isSelected: true,
-    },
-  ];
-
   const search = () => {
     const queries = [];
 
@@ -139,6 +124,7 @@ const CreateOrEditMedicalRecord = () => {
             ...data,
             PatientId: selectedPatient.$id,
             DoctorId: selectedDoctor.$id,
+            prescriptions,
           })
           .finally(() => setLoading(false))
           .then((res) => {
@@ -155,7 +141,7 @@ const CreateOrEditMedicalRecord = () => {
             ...data,
             PatientId: selectedPatient.$id,
             DoctorId: selectedDoctor.$id,
-            prescriptions
+            prescriptions,
           })
           .finally(() => setLoading(false))
           .then((res) => {
@@ -170,14 +156,6 @@ const CreateOrEditMedicalRecord = () => {
     } catch (error) {
       notify.error();
     }
-  };
-
-  const getMedicalRecords = (queries = []) => {
-    medicalRecordService.getMedicalRecords(queries).then((res) => {
-      if (res.documents) {
-        setSelectedRecord(res.documents[0]);
-      }
-    });
   };
 
   const createMedicalRecord = () => {
@@ -212,9 +190,17 @@ const CreateOrEditMedicalRecord = () => {
       }
     });
 
-    if (switchData?.Id) {
-      const query = switchData?.Id ? [Query.equal("Id", switchData?.Id)] : [];
-      getMedicalRecords(query);
+    if (switchData) {
+      setSelectedPatient(switchData.Patients);
+      setSelectedDoctor(switchData.Doctors);
+      switchData.prescriptions.forEach((item) => {
+        setPrescriptions((prev) => [
+          ...prev,
+          { Medicine: item.Medicines, Dosage: item.Dosage },
+        ]);
+      });
+
+      setShowCreateField(true);
     } else {
       patientService.getPatients([]).then((res) => {
         if (res.documents) {
@@ -260,61 +246,66 @@ const CreateOrEditMedicalRecord = () => {
         </Button>
       </div>
 
+      <div className="flex justify-center mb-3">
+        <div className="w-11/12 flex gap-2">
+          <div className="w-full md:w-3/12">
+            <PRAutoComplete
+              items={doctors}
+              selectedItem={selectedDoctor}
+              setSelectedItem={setSelectedDoctor}
+              property="Name"
+              label="Doctor"
+              disabled={
+                appointments.length > 0 || pageIndex === PageSwitch.EditPage
+              }
+            />
+          </div>
+
+          <div className="w-full md:w-3/12">
+            <PRAutoComplete
+              items={patients}
+              selectedItem={selectedPatient}
+              setSelectedItem={setSelectedPatient}
+              property="Name"
+              label="Patient"
+              disabled={
+                appointments.length > 0 || pageIndex === PageSwitch.EditPage
+              }
+            />
+          </div>
+
+          {pageIndex === PageSwitch.CreatePage ? (
+            <div className="w-full md:w-3/12">
+              <Button
+                onClickEvent={search}
+                className="mt-7"
+                disabled={!isFormValid()}
+              >
+                Search
+              </Button>
+            </div>
+          ) : null}
+        </div>
+      </div>
+
       {pageIndex === PageSwitch.CreatePage ? (
-        <>
-          <div className="flex justify-center mb-3">
-            <div className="w-11/12 flex gap-2">
-              <div className="w-full md:w-3/12">
-                <PRAutoComplete
-                  items={doctors}
-                  selectedItem={selectedDoctor}
-                  setSelectedItem={setSelectedDoctor}
-                  property="Name"
-                  label="Doctor"
-                  disabled={appointments.length > 0}
-                />
-              </div>
-
-              <div className="w-full md:w-3/12">
-                <PRAutoComplete
-                  items={patients}
-                  selectedItem={selectedPatient}
-                  setSelectedItem={setSelectedPatient}
-                  property="Name"
-                  label="Patient"
-                  disabled={appointments.length > 0}
-                />
-              </div>
-
-              <div className="w-full md:w-3/12">
-                <Button
-                  onClickEvent={search}
-                  className="mt-7"
-                  disabled={!isFormValid()}
-                >
-                  Search
-                </Button>
-              </div>
-            </div>
+        <div className="flex justify-center">
+          <div className="w-11/12 p-5 border border-gray-300 rounded overflow-x-auto mx-auto">
+            <PRDataTable
+              value={appointments}
+              loading={loading}
+              cols={cols}
+              actions={actionFields}
+              headerText="Appointments"
+            />
           </div>
-
-          <div className="flex justify-center">
-            <div className="w-11/12 p-5 border border-gray-300 rounded overflow-x-auto mx-auto">
-              <PRDataTable
-                value={appointments}
-                loading={loading}
-                cols={cols}
-                actions={actionFields}
-              />
-            </div>
-          </div>
-        </>
+        </div>
       ) : null}
 
       {showCreateField ? (
         <>
           <div className="flex justify-center mt-3">
-            <div className="w-10/12 flex flex-col shadow-md shadow-cyan-200 border border-gray-300 rounded-md">
+            <div className="w-11/12 flex flex-col shadow-md shadow-cyan-200 border border-gray-300 rounded-md">
               <h1 className="text-xl p-3 mx-auto text-center font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white mb-2">
                 Create Medical Record
               </h1>
@@ -365,14 +356,40 @@ const CreateOrEditMedicalRecord = () => {
 
                 {medicines.length > 0 ? (
                   <div className="mb-4 w-full p-2">
-                    <PRDataTable
-                      value={prescriptions}
-                      loading={loading}
-                      cols={colsPresc}
-                      actions={[
-                        { functionRef: removeMedicine, label: "Remove" },
-                      ]}
-                    />
+                    <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                      <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                        <tr>
+                          <th scope="col" className="px-6 py-3">
+                            Medicine
+                          </th>
+                          <th scope="col" className="px-6 py-3">
+                            Dosage
+                          </th>
+                          <th scope="col" className="px-6 py-3 w-2/12"></th>
+                        </tr>
+                      </thead>
+
+                      <tbody>
+                        {prescriptions?.map((item, index) => (
+                          <tr
+                            key={index}
+                            className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+                          >
+                            <td className="px-6 py-4">{item.Medicine.Name}</td>
+                            <td className="px-6 py-4">{item.Dosage}</td>
+                            <td className="px-6 py-4">
+                              <Button
+                                className="w-full"
+                                isLoading={loading}
+                                onClickEvent={() => removeMedicine(item)}
+                              >
+                                Remove
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 ) : null}
 

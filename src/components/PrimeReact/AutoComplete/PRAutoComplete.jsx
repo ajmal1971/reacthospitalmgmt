@@ -14,21 +14,17 @@ const PRAutoComplete = ({
   const [filteredItems, setFilteredItems] = useState(null);
 
   const search = (event) => {
-    setTimeout(() => {
-      let _filteredItems;
+    let _filteredItems;
 
-      if (!event.query.trim().length) {
-        _filteredItems = [...items];
-      } else {
-        _filteredItems = items.filter((item) => {
-          return item[property]
-            .toLowerCase()
-            .includes(event.query.toLowerCase());
-        });
-      }
+    if (!event.query.trim().length) {
+      _filteredItems = [...items];
+    } else {
+      _filteredItems = items.filter((item) => {
+        return item[property].toLowerCase().includes(event.query.toLowerCase());
+      });
+    }
 
-      setFilteredItems(_filteredItems);
-    }, 0);
+    setFilteredItems(_filteredItems);
   };
 
   return (

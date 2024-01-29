@@ -9,7 +9,7 @@ import { switchPage } from "../../../store/pageSwitchSlice";
 import { Query } from "appwrite";
 import { PRDataTable, PRAutoComplete, Button } from "../../index";
 import { notify, confirm } from "../../../shared/Utility";
-import { Dialog } from 'primereact/dialog';
+import { Dialog } from "primereact/dialog";
 import DOMPurify from "dompurify";
 
 const ManageMedicalRecord = () => {
@@ -98,9 +98,16 @@ const ManageMedicalRecord = () => {
   };
 
   const editMedicalRecord = (rowData) => {
-    dispatch(
-      switchPage({ pageIndex: PageSwitch.EditPage, switchData: rowData })
-    );
+    setLoading(true);
+    getMedicalRecordWiseDetail(rowData.$id)
+      .finally(() => setLoading(false))
+      .then((res) => {
+        if (res) {
+          dispatch(
+            switchPage({ pageIndex: PageSwitch.EditPage, switchData: res })
+          );
+        }
+      });
   };
 
   const deleteMedicalRecord = async (rowData) => {
@@ -120,10 +127,9 @@ const ManageMedicalRecord = () => {
     });
   };
 
-  const medicalRecordDetails = async (rowData) => {
+  const showDetailModal = async (rowData) => {
     setLoading(true);
-    medicalRecordService
-      .getRecordDetails(rowData.$id)
+    getMedicalRecordWiseDetail(rowData.$id)
       .finally(() => setLoading(false))
       .then((res) => {
         if (res) {
@@ -131,6 +137,10 @@ const ManageMedicalRecord = () => {
           setDialogVisible(true);
         }
       });
+  };
+
+  const getMedicalRecordWiseDetail = async ($id) => {
+    return await medicalRecordService.getRecordDetails($id);
   };
 
   useEffect(() => {
@@ -155,7 +165,7 @@ const ManageMedicalRecord = () => {
   const actionFields = [
     { functionRef: editMedicalRecord, label: "Edit" },
     { functionRef: deleteMedicalRecord, label: "Delete" },
-    { functionRef: medicalRecordDetails, label: "Details" },
+    { functionRef: showDetailModal, label: "Details" },
   ];
 
   const navigatePage = () => {
@@ -212,24 +222,37 @@ const ManageMedicalRecord = () => {
             loading={loading}
             cols={cols}
             actions={actionFields}
+            headerText="Medical Records"
           />
         </div>
       </div>
 
       <div className="card flex justify-content-center">
-        <Dialog header="Medical Record Detail" visible={dialogVisible} style={{ width: '50vw' }} onHide={() => setDialogVisible(false)}>
+        <Dialog
+          header="Medical Record Detail"
+          visible={dialogVisible}
+          style={{ width: "50vw" }}
+          onHide={() => setDialogVisible(false)}
+        >
           <div className="w-full">
             <label className="block text-gray-700 text-lg font-bold mb-2">
               Symptoms
             </label>
-            <p className="mb-5 w-full text-gray-700 text-sm">{medicalrecordDetail?.Symptoms}</p>
+            <p className="mb-5 w-full text-gray-700 text-sm">
+              {medicalrecordDetail?.Symptoms}
+            </p>
           </div>
 
           <div className="w-full">
             <label className="block text-gray-700 text-lg font-bold mb-2">
               Diagnosis
             </label>
-            <p className="mb-5 w-full text-gray-700 text-sm" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(medicalrecordDetail?.Diagnosis) }} />
+            <p
+              className="mb-5 w-full text-gray-700 text-sm"
+              dangerouslySetInnerHTML={{
+                __html: DOMPurify.sanitize(medicalrecordDetail?.Diagnosis),
+              }}
+            />
           </div>
 
           <div className="w-full">
@@ -241,21 +264,25 @@ const ManageMedicalRecord = () => {
               <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                 <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                   <tr>
-                    <th scope="col" className="px-6 py-3">Medicine</th>
-                    <th scope="col" className="px-6 py-3">Dosage</th>
+                    <th scope="col" className="px-6 py-3">
+                      Medicine
+                    </th>
+                    <th scope="col" className="px-6 py-3">
+                      Dosage
+                    </th>
                   </tr>
                 </thead>
 
                 <tbody>
-                  {
-                    medicalrecordDetail?.prescriptions.map((item, index) =>
-                    (
-                      <tr key={index} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                        <td className="px-6 py-4">{item.Medicines.Name}</td>
-                        <td className="px-6 py-4">{item.Dosage}</td>
-                      </tr>
-                    ))
-                  }
+                  {medicalrecordDetail?.prescriptions.map((item, index) => (
+                    <tr
+                      key={index}
+                      className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+                    >
+                      <td className="px-6 py-4">{item.Medicines.Name}</td>
+                      <td className="px-6 py-4">{item.Dosage}</td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>

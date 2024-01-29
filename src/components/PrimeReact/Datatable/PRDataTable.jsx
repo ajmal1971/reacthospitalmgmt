@@ -9,7 +9,13 @@ import { MultiSelect } from "primereact/multiselect";
 import { DataType } from "../../../shared/AppEnum.js";
 
 const PRDataTable = (
-  { value = [], loading = false, cols = [], actions = [] },
+  {
+    value = [],
+    loading = false,
+    cols = [],
+    actions = [],
+    headerText = "Table Header",
+  },
   ref
 ) => {
   const [selectedOptions, setSelectedOptions] = useState(
@@ -18,17 +24,23 @@ const PRDataTable = (
 
   const renderHeader = () => {
     return (
-      <div className="flex">
-        <MultiSelect
-          value={selectedOptions}
-          onChange={(e) => setSelectedOptions(e.value)}
-          options={cols}
-          optionLabel="header"
-          filter
-          placeholder="Select Items"
-          maxSelectedLabels={3}
-          className="w-1/5"
-        />
+      <div className="flex flex-row w-full">
+        <div className="w-1/2">
+          <MultiSelect
+            value={selectedOptions}
+            onChange={(e) => setSelectedOptions(e.value)}
+            options={cols}
+            optionLabel="header"
+            filter
+            placeholder="Select Items"
+            maxSelectedLabels={3}
+            className="w-2/5"
+          />
+        </div>
+
+        <div className="w-1/2">
+          <label>{headerText}</label>
+        </div>
       </div>
     );
   };
