@@ -357,15 +357,15 @@ const CreateOrEditMedicalRecord = () => {
                 {medicines.length > 0 ? (
                   <div className="mb-4 w-full p-2">
                     <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                      <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                      <thead className="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
-                          <th scope="col" className="px-6 py-3">
+                          <th scope="col" className="px-6 py-3 text-md">
                             Medicine
                           </th>
-                          <th scope="col" className="px-6 py-3">
+                          <th scope="col" className="px-6 py-3 text-md">
                             Dosage
                           </th>
-                          <th scope="col" className="px-6 py-3 w-2/12"></th>
+                          <th scope="col" className="px-6 py-3 text-md w-2/12"></th>
                         </tr>
                       </thead>
 

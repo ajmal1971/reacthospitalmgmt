@@ -8,7 +8,7 @@ function PRCalendar ({label, calendarVal, setCalendarVal, ...props}, ref) {
 
     return (
         <div className="w-full">
-            <label htmlFor={calendarId} className='block text-gray-700 text-sm font-bold mb-2'>{label}</label>
+            <label htmlFor={calendarId} className='block text-gray-700 text-lg font-bold mb-2'>{label}</label>
             <Calendar ref={ref} id={calendarId} value={calendarVal} onChange={(e) => setCalendarVal(e.value)} showIcon placeholder="Select Date" dateFormat="dd-M-y" {...props} />
         </div>
     );

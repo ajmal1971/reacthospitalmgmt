@@ -30,7 +30,7 @@ const PRAutoComplete = ({
   return (
     <div className="w-full">
       <label
-        className={`block text-gray-700 text-sm font-bold mb-2 ${className}`}
+        className={`block text-gray-700 text-lg font-bold mb-2 ${className}`}
         htmlFor="autocomplete"
       >
         {label}

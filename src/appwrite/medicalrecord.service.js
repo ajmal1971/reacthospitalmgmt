@@ -12,10 +12,6 @@ export class MedicalRecordService {
     .split(",")
     .find((pair) => pair.includes("MedicalRecords"))
     .split(":")[1];
-  prescCollectionId = config.appwriteCollectionId
-    .split(",")
-    .find((pair) => pair.includes("Prescriptions"))
-    .split(":")[1];
 
   constructor() {
     this.client
@@ -49,19 +45,9 @@ export class MedicalRecordService {
       );
 
       if (prescriptions.length > 0) {
-        prescriptions.forEach(async (item) => {
-          await this.databases.createDocument(
-            config.appwriteDatabaseId,
-            this.prescCollectionId,
-            ID.unique(),
-            {
-              MedicalRecords: result.$id,
-              Medicines: item.Medicine.$id,
-              Dosage: item.Dosage,
-              Id: recordId,
-            }
-          );
-        });
+        await Promise.all(prescriptions.map(async (item) => {
+          await prescriptionService.createPrescription({ MedicalRecordId: result.$id, MedicineId: item.Medicine.$id, Dosage: item.Dosage });
+        }));
       }
 
       return result;
@@ -70,8 +56,26 @@ export class MedicalRecordService {
     }
   }
 
-  async updateMedicalRecord($id, { PatientId, DoctorId, Symptoms, Diagnosis }) {
+  async updateMedicalRecord($id, { PatientId, DoctorId, Symptoms, Diagnosis, prescriptions = [] }) {
     try {
+      const result = await prescriptionService.getPrescriptions([Query.equal("MedicalRecords", $id)]);
+
+      //Delete Existing Prescriptions
+      if (result && result.documents.length > 0) {
+        await Promise.all(
+          result.documents.map(async (item) => {
+            await prescriptionService.deletePrescription(item.$id);
+          })
+        );
+      }
+
+      //Create New Prescriptions
+      if (prescriptions.length > 0) {
+        await Promise.all(prescriptions.map(async (item) => {
+          await prescriptionService.createPrescription({ MedicalRecordId: $id, MedicineId: item.Medicine.$id, Dosage: item.Dosage });
+        }));
+      }
+
       return await this.databases.updateDocument(
         config.appwriteDatabaseId,
         this.collectionId,
