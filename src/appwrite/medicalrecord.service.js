@@ -31,7 +31,7 @@ export class MedicalRecordService {
     prescriptions = [],
   }) {
     try {
-      const recordId = await getRecordId(this.getMedicalRecords.bind(this));
+      const recordId = await getRecordId(this.getListDocuments.bind(this));
       const result = await this.databases.createDocument(
         config.appwriteDatabaseId,
         this.collectionId,
@@ -47,9 +47,15 @@ export class MedicalRecordService {
       );
 
       if (prescriptions.length > 0) {
-        await Promise.all(prescriptions.map(async (item) => {
-          await prescriptionService.createPrescription({ MedicalRecordId: result.$id, MedicineId: item.Medicine.$id, Dosage: item.Dosage });
-        }));
+        await Promise.all(
+          prescriptions.map(async (item) => {
+            await prescriptionService.createPrescription({
+              MedicalRecordId: result.$id,
+              MedicineId: item.Medicine.$id,
+              Dosage: item.Dosage,
+            });
+          })
+        );
       }
 
       return result;
@@ -58,9 +64,14 @@ export class MedicalRecordService {
     }
   }
 
-  async updateMedicalRecord($id, { PatientId, DoctorId, Symptoms, Diagnosis, prescriptions = [] }) {
+  async updateMedicalRecord(
+    $id,
+    { PatientId, DoctorId, Symptoms, Diagnosis, prescriptions = [] }
+  ) {
     try {
-      const result = await prescriptionService.getPrescriptions([Query.equal("MedicalRecords", $id)]);
+      const result = await prescriptionService.getPrescriptions([
+        Query.equal("MedicalRecords", $id),
+      ]);
 
       //Delete Existing Prescriptions
       if (result && result.documents.length > 0) {
@@ -73,9 +84,15 @@ export class MedicalRecordService {
 
       //Create New Prescriptions
       if (prescriptions.length > 0) {
-        await Promise.all(prescriptions.map(async (item) => {
-          await prescriptionService.createPrescription({ MedicalRecordId: $id, MedicineId: item.Medicine.$id, Dosage: item.Dosage });
-        }));
+        await Promise.all(
+          prescriptions.map(async (item) => {
+            await prescriptionService.createPrescription({
+              MedicalRecordId: $id,
+              MedicineId: item.Medicine.$id,
+              Dosage: item.Dosage,
+            });
+          })
+        );
       }
 
       return await this.databases.updateDocument(
@@ -121,13 +138,38 @@ export class MedicalRecordService {
     }
   }
 
-  async getMedicalRecords(quories = []) {
+  async getListDocuments(quories = []) {
     try {
       return await this.databases.listDocuments(
         config.appwriteDatabaseId,
         this.collectionId,
         quories
       );
+    } catch (error) {
+      console.log("Appwrite Service :: getListDocuments :: error", error);
+      return false;
+    }
+  }
+
+  async getMedicalRecords(quories = []) {
+    try {
+      var records = [];
+      const response = await this.getListDocuments(quories);
+      response.documents.forEach((item) => {
+        records.push({
+          $id: item.$id,
+          $createdAt: item.$createdAt,
+          $updatedAt: item.$updatedAt,
+          Id: item.Id,
+          Diagnosis: item.Diagnosis,
+          Symptoms: item.Symptoms,
+          Doctor: item.Doctors.Name,
+          Patient: item.Patients.Name,
+          AppointmentDate: item.Appointments.AppointmentDate,
+        });
+      });
+
+      return records;
     } catch (error) {
       console.log("Appwrite Service :: getMedicalRecords :: error", error);
       return false;
@@ -136,7 +178,7 @@ export class MedicalRecordService {
 
   async getRecordDetails(recordId) {
     try {
-      const medicalRecord = await this.getMedicalRecords([
+      const medicalRecord = await this.getListDocuments([
         Query.equal("$id", recordId),
       ]);
       const prescriptions = await prescriptionService.getPrescriptions([

@@ -4,7 +4,7 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { DatatableSettings } from "../../../shared/Constants";
 import { dateTimeFormat, dateFormat } from "../../../shared/Utility.js";
-import { Button } from "../../index.js";
+import { IconBtn } from "../../index.js";
 import { MultiSelect } from "primereact/multiselect";
 import { DataType } from "../../../shared/AppEnum.js";
 
@@ -50,9 +50,14 @@ const PRDataTable = (
       <div className="flex justify-center gap-2">
         {actions &&
           actions.map((item, index) => (
-            <Button key={index} onClickEvent={() => item.functionRef(rowData)}>
+            <IconBtn
+              key={index}
+              onClickEvent={() => item.functionRef(rowData)}
+              icon={item.icon}
+              isLoading={loading}
+            >
               {item.label}
-            </Button>
+            </IconBtn>
           ))}
       </div>
     );

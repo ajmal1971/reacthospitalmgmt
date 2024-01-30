@@ -28,6 +28,7 @@ import MedicalRecord from "./PatientData/MedicalRecord/MedicalRecord";
 import ManageMedicalRecord from "./PatientData/MedicalRecord/ManageMedicalRecord";
 import CreateOrEditMedicalRecord from "./PatientData/MedicalRecord/CreateOrEditMedicalRecord";
 import TextArea from "./Utilities/TextArea";
+import IconBtn from "./Utilities/IconBtn";
 
 export {
   Input,
@@ -59,5 +60,6 @@ export {
   MedicalRecord,
   ManageMedicalRecord,
   CreateOrEditMedicalRecord,
-  TextArea
+  TextArea,
+  IconBtn,
 };

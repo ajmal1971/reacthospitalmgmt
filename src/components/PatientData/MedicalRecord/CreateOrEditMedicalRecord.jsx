@@ -8,13 +8,14 @@ import appointmentService from "../../../appwrite/appointment.service";
 import { useDispatch, useSelector } from "react-redux";
 import { switchPage } from "../../../store/pageSwitchSlice";
 import { Query } from "appwrite";
+import { Icons } from "../../../shared/AppEnum";
 import {
   PRDataTable,
   PRAutoComplete,
   Button,
-  TextArea,
   TextEditor,
   Input,
+  IconBtn,
 } from "../../index";
 import { notify } from "../../../shared/Utility";
 import medicalRecordService from "../../../appwrite/medicalrecord.service";
@@ -45,7 +46,7 @@ const CreateOrEditMedicalRecord = () => {
 
   const [dosage, setDosage] = useState("");
 
-  const { register, handleSubmit, control, getValues } = useForm({
+  const { handleSubmit, control, getValues } = useForm({
     defaultValues: {
       $id: switchData?.$id || null,
       Symptoms: switchData?.Symptoms || "",
@@ -161,7 +162,7 @@ const CreateOrEditMedicalRecord = () => {
   };
 
   const createMedicalRecord = (rowData) => {
-    setSelectedAppointment(rowData)
+    setSelectedAppointment(rowData);
     setShowCreateField(true);
   };
 
@@ -194,7 +195,6 @@ const CreateOrEditMedicalRecord = () => {
     });
 
     if (switchData) {
-      console.log(switchData.Appointments);
       setSelectedPatient(switchData.Patients);
       setSelectedDoctor(switchData.Doctors);
       setSelectedAppointment(switchData.Appointments);
@@ -233,7 +233,9 @@ const CreateOrEditMedicalRecord = () => {
     }
   }, [switchData]);
 
-  const actionFields = [{ functionRef: createMedicalRecord, label: "Create" }];
+  const actionFields = [
+    { functionRef: createMedicalRecord, icon: Icons.create },
+  ];
 
   const navigateBack = () => {
     dispatch(switchPage({ pageIndex: PageSwitch.ViewPage, switchData: null }));
@@ -317,10 +319,11 @@ const CreateOrEditMedicalRecord = () => {
 
               <form onSubmit={handleSubmit(submit)}>
                 <div className="mb-4 w-full p-2">
-                  <TextArea
+                  <TextEditor
                     label="Symptoms"
-                    placeholder="Enter Symptoms"
-                    {...register("Symptoms", { required: true })}
+                    name="Symptoms"
+                    control={control}
+                    defaultValue={getValues("Symptoms")}
                   />
                 </div>
 
@@ -349,18 +352,16 @@ const CreateOrEditMedicalRecord = () => {
                     onChange={(e) => setDosage(e.target.value)}
                   />
 
-                  <Button
-                    className="w-3/12"
+                  <IconBtn
+                    icon={Icons.create}
+                    onClickEvent={addMedicineToList}
                     isLoading={loading}
                     disabled={!selectedMedicine || !dosage}
-                    onClickEvent={addMedicineToList}
-                  >
-                    Add
-                  </Button>
+                  />
                 </div>
 
                 {medicines.length > 0 ? (
-                  <div className="mb-4 w-full p-2">
+                  <div className="mb-1 w-full p-2">
                     <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                       <thead className="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
@@ -370,7 +371,10 @@ const CreateOrEditMedicalRecord = () => {
                           <th scope="col" className="px-6 py-3 text-md">
                             Dosage
                           </th>
-                          <th scope="col" className="px-6 py-3 text-md w-2/12"></th>
+                          <th
+                            scope="col"
+                            className="px-6 py-3 text-md w-2/12"
+                          ></th>
                         </tr>
                       </thead>
 
@@ -383,13 +387,11 @@ const CreateOrEditMedicalRecord = () => {
                             <td className="px-6 py-4">{item.Medicine.Name}</td>
                             <td className="px-6 py-4">{item.Dosage}</td>
                             <td className="px-6 py-4">
-                              <Button
-                                className="w-full"
-                                isLoading={loading}
+                              <IconBtn
+                                icon={Icons.delete}
                                 onClickEvent={() => removeMedicine(item)}
-                              >
-                                Remove
-                              </Button>
+                                isLoading={loading}
+                              />
                             </td>
                           </tr>
                         ))}
@@ -398,8 +400,8 @@ const CreateOrEditMedicalRecord = () => {
                   </div>
                 ) : null}
 
-                <div className="mb-4 w-full p-2">
-                  <Button type="submit" className="w-full" isLoading={loading}>
+                <div className="mb-4 w-full p-2 flex flex-row justify-center">
+                  <Button type="submit" className="w-1/3" isLoading={loading}>
                     {switchData ? "Update" : "Submit"}
                   </Button>
                 </div>

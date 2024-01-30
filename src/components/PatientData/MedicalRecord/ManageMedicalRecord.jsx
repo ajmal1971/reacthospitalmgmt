@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
-import { PageSwitch, DataType } from "../../../shared/AppEnum";
+import { PageSwitch, DataType, Icons } from "../../../shared/AppEnum";
 import patientService from "../../../appwrite/patient.service";
 import doctorService from "../../../appwrite/doctor.service";
 import medicalRecordService from "../../../appwrite/medicalrecord.service";
@@ -36,15 +36,21 @@ const ManageMedicalRecord = () => {
       isSelected: false,
     },
     {
-      field: "Patients.Name",
+      field: "Patient",
       header: "Patient",
       dataType: DataType.string,
       isSelected: true,
     },
     {
-      field: "Doctors.Name",
+      field: "Doctor",
       header: "Doctor",
       dataType: DataType.string,
+      isSelected: true,
+    },
+    {
+      field: "AppointmentDate",
+      header: "Appointment Dt",
+      dataType: DataType.date,
       isSelected: true,
     },
     {
@@ -90,8 +96,8 @@ const ManageMedicalRecord = () => {
   const getMedicalRecords = (queries = []) => {
     setLoading(true);
     medicalRecordService.getMedicalRecords(queries).then((res) => {
-      if (res.documents) {
-        setMedicalRecords(res.documents);
+      if (res) {
+        setMedicalRecords(res);
         setLoading(false);
       }
     });
@@ -163,9 +169,9 @@ const ManageMedicalRecord = () => {
   }, [switchData?.Id]);
 
   const actionFields = [
-    { functionRef: editMedicalRecord, label: "Edit" },
-    { functionRef: deleteMedicalRecord, label: "Delete" },
-    { functionRef: showDetailModal, label: "Details" },
+    { functionRef: editMedicalRecord, icon: Icons.edit },
+    { functionRef: deleteMedicalRecord, icon: Icons.delete },
+    { functionRef: showDetailModal, icon: Icons.details },
   ];
 
   const navigatePage = () => {
@@ -238,9 +244,12 @@ const ManageMedicalRecord = () => {
             <label className="block text-gray-700 text-lg font-bold mb-2">
               Symptoms
             </label>
-            <p className="mb-5 w-full text-gray-700 text-sm">
-              {medicalrecordDetail?.Symptoms}
-            </p>
+            <p
+              className="mb-5 w-full text-gray-700 text-sm"
+              dangerouslySetInnerHTML={{
+                __html: DOMPurify.sanitize(medicalrecordDetail?.Symptoms),
+              }}
+            />
           </div>
 
           <div className="w-full">
