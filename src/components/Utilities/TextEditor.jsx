@@ -1,17 +1,19 @@
 /* eslint-disable react/prop-types */
 import {Editor} from '@tinymce/tinymce-react';
 import { Controller } from 'react-hook-form';
+import config from '../../config/config';
 
 export default function TextEditor ({name, control, label, defaultValue = ''}) {
     return (
         <div className='w-full'>
-            {label && <label className='inline-block mb-1 pl-1'>{label}</label>}
+            {label && <label className='block text-gray-700 text-lg font-bold mb-2'>{label}</label>}
             <Controller
             name={name || 'content'}
             control={control}
             render={({field: {onChange}}) => (
                 <Editor
                 initialValue={defaultValue}
+                apiKey = {config.tinyApiKey}
                 init={
                     {
                         initialValue: defaultValue,
