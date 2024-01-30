@@ -25,6 +25,7 @@ export class MedicalRecordService {
   async createMedicalRecord({
     PatientId,
     DoctorId,
+    AppointmentId,
     Symptoms,
     Diagnosis,
     prescriptions = [],
@@ -38,6 +39,7 @@ export class MedicalRecordService {
         {
           Patients: PatientId,
           Doctors: DoctorId,
+          Appointments: AppointmentId,
           Symptoms,
           Diagnosis,
           Id: recordId,

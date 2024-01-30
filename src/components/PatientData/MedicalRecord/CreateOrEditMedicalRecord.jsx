@@ -27,6 +27,7 @@ const CreateOrEditMedicalRecord = () => {
 
   const [loading, setLoading] = useState(false);
   const [appointments, setAppointments] = useState([]);
+  const [selectedAppointment, setSelectedAppointment] = useState(undefined);
 
   const [patients, setPatients] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState(undefined);
@@ -141,6 +142,7 @@ const CreateOrEditMedicalRecord = () => {
             ...data,
             PatientId: selectedPatient.$id,
             DoctorId: selectedDoctor.$id,
+            AppointmentId: selectedAppointment.$id,
             prescriptions,
           })
           .finally(() => setLoading(false))
@@ -158,7 +160,8 @@ const CreateOrEditMedicalRecord = () => {
     }
   };
 
-  const createMedicalRecord = () => {
+  const createMedicalRecord = (rowData) => {
+    setSelectedAppointment(rowData)
     setShowCreateField(true);
   };
 
@@ -191,8 +194,10 @@ const CreateOrEditMedicalRecord = () => {
     });
 
     if (switchData) {
+      console.log(switchData.Appointments);
       setSelectedPatient(switchData.Patients);
       setSelectedDoctor(switchData.Doctors);
+      setSelectedAppointment(switchData.Appointments);
       switchData.prescriptions.forEach((item) => {
         setPrescriptions((prev) => [
           ...prev,
