@@ -4,12 +4,12 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { Input, Button } from "../../index";
-import departmentService from "../../../appwrite/department.service";
+import testService from "../../../appwrite/test.service";
 import { switchPage } from "../../../store/pageSwitchSlice";
 import { PageSwitch } from "../../../shared/AppEnum";
 import { notify } from "../../../shared/Utility";
 
-function CreateOrEditDepartment() {
+const CreateOrEditTest = () => {
   const dispatch = useDispatch();
   const switchData = useSelector((state) => state.pageSwitch.switchData);
   const [isLoading, setIsLoading] = useState(false);
@@ -19,6 +19,7 @@ function CreateOrEditDepartment() {
       $id: switchData?.$id || null,
       Name: switchData?.Name || "",
       Description: switchData?.Description || "",
+      Cost: switchData?.Cost || "",
     },
   });
 
@@ -26,8 +27,8 @@ function CreateOrEditDepartment() {
     setIsLoading(true);
     try {
       if (switchData) {
-        departmentService
-          .updateDepartment(switchData.$id, { ...data })
+        testService
+          .updateTest(switchData.$id, { ...data })
           .finally(() => setIsLoading(false))
           .then((res) => {
             if (res) {
@@ -38,8 +39,8 @@ function CreateOrEditDepartment() {
             }
           });
       } else {
-        departmentService
-          .createDepartment({ ...data })
+        testService
+          .createTest({ ...data })
           .finally(() => setIsLoading(false))
           .then((res) => {
             if (res) {
@@ -75,7 +76,7 @@ function CreateOrEditDepartment() {
         <div className="w-full bg-white rounded-lg md:mt-0 sm:max-w-md xl:p-0 border border-gray-300 shadow-xl shadow-cyan-200">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-              {!switchData ? "Create Department" : "Update Department"}
+              {!switchData ? "Create Test" : "Update Test"}
             </h1>
             <form
               onSubmit={handleSubmit(submitForm)}
@@ -84,7 +85,7 @@ function CreateOrEditDepartment() {
             >
               <Input
                 label="Name"
-                placeholder="Enter Department Name"
+                placeholder="Enter Test Name"
                 className="mb-4"
                 {...register("Name", { required: true })}
               />
@@ -96,6 +97,14 @@ function CreateOrEditDepartment() {
                 {...register("Description")}
               />
 
+              <Input
+                label="Cost"
+                type="number"
+                placeholder="Enter Cost"
+                className="mb-4"
+                {...register("Cost", { required: true })}
+              />
+
               <Button type="submit" className="w-full" isLoading={isLoading}>
                 {switchData ? "Update" : "Submit"}
               </Button>
@@ -105,6 +114,6 @@ function CreateOrEditDepartment() {
       </div>
     </section>
   );
-}
+};
 
-export default CreateOrEditDepartment;
+export default CreateOrEditTest;

@@ -14,6 +14,7 @@ import {
   Patient,
   MedicalRecord,
   Appointment,
+  Test,
 } from "./components/index.js";
 import { Provider } from "react-redux";
 import store from "./store/store.js";
@@ -38,6 +39,10 @@ const router = createBrowserRouter([
       {
         path: "/medicines",
         element: <Medicine />,
+      },
+      {
+        path: "/tests",
+        element: <Test />,
       },
       {
         path: "/patient",
