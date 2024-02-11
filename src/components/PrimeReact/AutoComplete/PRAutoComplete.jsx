@@ -9,6 +9,7 @@ const PRAutoComplete = ({
   property,
   label,
   disabled = false,
+  multiple = false,
   className = "",
 }) => {
   const [filteredItems, setFilteredItems] = useState(null);
@@ -35,15 +36,28 @@ const PRAutoComplete = ({
       >
         {label}
       </label>
-      <AutoComplete
-        field={property}
-        placeholder={"Select " + label}
-        value={selectedItem}
-        suggestions={filteredItems}
-        completeMethod={search}
-        onChange={(e) => setSelectedItem(e.value)}
-        disabled={disabled}
-      />
+      {multiple ? (
+        <AutoComplete
+          field={property}
+          placeholder={"Select " + label}
+          multiple
+          value={selectedItem}
+          suggestions={filteredItems}
+          completeMethod={search}
+          onChange={(e) => setSelectedItem(e.value)}
+          disabled={disabled}
+        />
+      ) : (
+        <AutoComplete
+          field={property}
+          placeholder={"Select " + label}
+          value={selectedItem}
+          suggestions={filteredItems}
+          completeMethod={search}
+          onChange={(e) => setSelectedItem(e.value)}
+          disabled={disabled}
+        />
+      )}
     </div>
   );
 };
