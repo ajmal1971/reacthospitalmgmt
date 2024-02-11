@@ -269,7 +269,7 @@ const ManageMedicalRecord = () => {
               Prescription
             </label>
 
-            <div className="relative overflow-x-auto">
+            <div className="relative overflow-x-auto mb-5">
               <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                 <thead className="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
                   <tr>
@@ -295,6 +295,17 @@ const ManageMedicalRecord = () => {
                 </tbody>
               </table>
             </div>
+          </div>
+
+          <div className="w-full">
+            <label className="block text-gray-700 text-lg font-bold mb-2">
+              Test Orders
+            </label>
+            <span>
+              {medicalrecordDetail?.testOrders
+                .map((item) => item.Tests.Name)
+                .join(", ")}
+            </span>
           </div>
         </Dialog>
       </div>

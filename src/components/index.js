@@ -29,6 +29,9 @@ import ManageMedicalRecord from "./PatientData/MedicalRecord/ManageMedicalRecord
 import CreateOrEditMedicalRecord from "./PatientData/MedicalRecord/CreateOrEditMedicalRecord";
 import TextArea from "./Utilities/TextArea";
 import IconBtn from "./Utilities/IconBtn";
+import Test from "./Hospital/Test/Test";
+import ManageTest from "./Hospital/Test/ManageTest";
+import CreateOrEditTest from "./Hospital/Test/CreateOrEditTest";
 
 export {
   Input,
@@ -62,4 +65,7 @@ export {
   CreateOrEditMedicalRecord,
   TextArea,
   IconBtn,
+  Test,
+  ManageTest,
+  CreateOrEditTest,
 };

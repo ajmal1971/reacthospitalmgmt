@@ -4,6 +4,7 @@ import { PageSwitch, DataType } from "../../../shared/AppEnum";
 import patientService from "../../../appwrite/patient.service";
 import doctorService from "../../../appwrite/doctor.service";
 import medicineService from "../../../appwrite/medicine.service";
+import testService from "../../../appwrite/test.service";
 import appointmentService from "../../../appwrite/appointment.service";
 import { useDispatch, useSelector } from "react-redux";
 import { switchPage } from "../../../store/pageSwitchSlice";
@@ -38,6 +39,9 @@ const CreateOrEditMedicalRecord = () => {
 
   const [medicines, setMedicines] = useState([]);
   const [selectedMedicine, setSelectedMedicine] = useState(undefined);
+
+  const [tests, setTests] = useState([]);
+  const [selectedTests, setSelectedTests] = useState(null);
 
   // const [selectedRecord, setSelectedRecord] = useState(undefined);
   const [showCreateField, setShowCreateField] = useState(false);
@@ -127,6 +131,7 @@ const CreateOrEditMedicalRecord = () => {
             PatientId: selectedPatient.$id,
             DoctorId: selectedDoctor.$id,
             prescriptions,
+            testOrders: selectedTests,
           })
           .finally(() => setLoading(false))
           .then((res) => {
@@ -145,6 +150,7 @@ const CreateOrEditMedicalRecord = () => {
             DoctorId: selectedDoctor.$id,
             AppointmentId: selectedAppointment.$id,
             prescriptions,
+            testOrders: selectedTests,
           })
           .finally(() => setLoading(false))
           .then((res) => {
@@ -194,16 +200,25 @@ const CreateOrEditMedicalRecord = () => {
       }
     });
 
+    testService.getTests([]).then((res) => {
+      if (res.documents) {
+        setTests(res.documents);
+      }
+    });
+
     if (switchData) {
       setSelectedPatient(switchData.Patients);
       setSelectedDoctor(switchData.Doctors);
       setSelectedAppointment(switchData.Appointments);
-      switchData.prescriptions.forEach((item) => {
-        setPrescriptions((prev) => [
-          ...prev,
-          { Medicine: item.Medicines, Dosage: item.Dosage },
-        ]);
-      });
+
+      setPrescriptions(
+        switchData.prescriptions.map((item) => ({
+          Medicine: item.Medicines,
+          Dosage: item.Dosage,
+        }))
+      );
+
+      setSelectedTests(switchData.testOrders.map((item) => item.Tests));
 
       setShowCreateField(true);
     } else {
@@ -361,7 +376,7 @@ const CreateOrEditMedicalRecord = () => {
                 </div>
 
                 {medicines.length > 0 ? (
-                  <div className="mb-1 w-full p-2">
+                  <div className="mb-4 w-full p-2">
                     <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                       <thead className="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
@@ -399,6 +414,18 @@ const CreateOrEditMedicalRecord = () => {
                     </table>
                   </div>
                 ) : null}
+
+                <div className="mb-4 w-full p-2 flex flex-row gap-2">
+                  <PRAutoComplete
+                    items={tests}
+                    selectedItem={selectedTests}
+                    setSelectedItem={setSelectedTests}
+                    property="Name"
+                    label="Tests"
+                    multiple={true}
+                    className="w-full"
+                  />
+                </div>
 
                 <div className="mb-4 w-full p-2 flex flex-row justify-center">
                   <Button type="submit" className="w-1/3" isLoading={loading}>

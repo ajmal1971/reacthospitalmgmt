@@ -3,6 +3,7 @@ import config from "../config/config";
 import { Client, ID, Databases, Storage, Query } from "appwrite";
 import { getRecordId } from "../shared/Utility";
 import prescriptionService from "./prescription.service";
+import testOrderService from "./testorder.service";
 
 export class MedicalRecordService {
   client = new Client();
@@ -29,6 +30,7 @@ export class MedicalRecordService {
     Symptoms,
     Diagnosis,
     prescriptions = [],
+    testOrders = [],
   }) {
     try {
       const recordId = await getRecordId(this.getListDocuments.bind(this));
@@ -58,6 +60,17 @@ export class MedicalRecordService {
         );
       }
 
+      if (testOrders.length > 0) {
+        await Promise.all(
+          testOrders.map(async (item) => {
+            await testOrderService.createTestOrder({
+              MedicalRecordId: result.$id,
+              TestId: item.$id,
+            });
+          })
+        );
+      }
+
       return result;
     } catch (error) {
       console.log("Appwrite Service :: createMedicalRecord :: error", error);
@@ -66,18 +79,38 @@ export class MedicalRecordService {
 
   async updateMedicalRecord(
     $id,
-    { PatientId, DoctorId, Symptoms, Diagnosis, prescriptions = [] }
+    {
+      PatientId,
+      DoctorId,
+      Symptoms,
+      Diagnosis,
+      prescriptions = [],
+      testOrders = [],
+    }
   ) {
     try {
-      const result = await prescriptionService.getPrescriptions([
+      const prescrips = await prescriptionService.getPrescriptions([
+        Query.equal("MedicalRecords", $id),
+      ]);
+
+      const tests = await testOrderService.getTestOrders([
         Query.equal("MedicalRecords", $id),
       ]);
 
       //Delete Existing Prescriptions
-      if (result && result.documents.length > 0) {
+      if (prescrips && prescrips.documents.length > 0) {
         await Promise.all(
-          result.documents.map(async (item) => {
+          prescrips.documents.map(async (item) => {
             await prescriptionService.deletePrescription(item.$id);
+          })
+        );
+      }
+
+      //Delete Existing Test Orders
+      if (tests && tests.documents.length > 0) {
+        await Promise.all(
+          tests.documents.map(async (item) => {
+            await testOrderService.deleteTestOrder(item.$id);
           })
         );
       }
@@ -90,6 +123,18 @@ export class MedicalRecordService {
               MedicalRecordId: $id,
               MedicineId: item.Medicine.$id,
               Dosage: item.Dosage,
+            });
+          })
+        );
+      }
+
+      //Create New Test Orders
+      if (testOrders.length > 0) {
+        await Promise.all(
+          testOrders.map(async (item) => {
+            await testOrderService.createTestOrder({
+              MedicalRecordId: $id,
+              TestId: item.$id,
             });
           })
         );
@@ -113,14 +158,26 @@ export class MedicalRecordService {
 
   async deleteMedicalRecord($id) {
     try {
-      const result = await prescriptionService.getPrescriptions([
+      const prescriptions = await prescriptionService.getPrescriptions([
         Query.equal("MedicalRecords", $id),
       ]);
 
-      if (result && result.documents.length > 0) {
+      const testOrders = await testOrderService.getTestOrders([
+        Query.equal("MedicalRecords", $id),
+      ]);
+
+      if (prescriptions && prescriptions.documents.length > 0) {
         await Promise.all(
-          result.documents.map(async (item) => {
+          prescriptions.documents.map(async (item) => {
             await prescriptionService.deletePrescription(item.$id);
+          })
+        );
+      }
+
+      if (testOrders && testOrders.documents.length > 0) {
+        await Promise.all(
+          testOrders.documents.map(async (item) => {
+            await testOrderService.deleteTestOrder(item.$id);
           })
         );
       }
@@ -181,12 +238,19 @@ export class MedicalRecordService {
       const medicalRecord = await this.getListDocuments([
         Query.equal("$id", recordId),
       ]);
+
       const prescriptions = await prescriptionService.getPrescriptions([
         Query.equal("MedicalRecords", recordId),
       ]);
+
+      const testOrders = await testOrderService.getTestOrders([
+        Query.equal("MedicalRecords", recordId),
+      ]);
+
       const result = {
         ...medicalRecord.documents[0],
         prescriptions: prescriptions.documents,
+        testOrders: testOrders.documents,
       };
 
       return result;
